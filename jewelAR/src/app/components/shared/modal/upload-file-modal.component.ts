@@ -71,7 +71,7 @@ export class UploadFileModalComponent implements OnInit {
     jewelInfo.purity = formValues.purity;
     jewelInfo.weight = formValues.weight;
     jewelInfo.price = formValues.price;
-    jewelInfo.jewellerId = '63f90fcc6932bca2906be640';
+    jewelInfo.jewellerId = '640062ee872031def6feed85';
     jewelInfo.image = this.selectedFiles;
     return jewelInfo;
   }
