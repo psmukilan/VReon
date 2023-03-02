@@ -23,9 +23,8 @@ navigator.mediaDevices.getUserMedia(constraints).then(function success(stream) {
 
 function gotFaces(results) {
     detections = results;
-
-
 }
+
 //mediapipe facemesh cdn Integration(Face Tracking API)
 const faceMesh = new FaceMesh({
     locateFile: (file) => {

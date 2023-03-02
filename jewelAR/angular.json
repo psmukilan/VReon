@@ -32,7 +32,8 @@
               "node_modules/popper.js/dist/umd/popper.min.js",
               "./node_modules/bootstrap/dist/js/bootstrap.bundle.min.js",
               "src/assets/camera_utils.js",
-              "src/assets/modelviewer.js"
+              "src/assets/modelviewer.js",
+              "src/app/components/jewel-page/face-detection.js"
             ]
           },
           "configurations": {
