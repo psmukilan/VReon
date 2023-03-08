@@ -1,0 +1,3 @@
+﻿<Project>
+  <Import Project="..\build\jewelAR_API.props" />
+</Project>

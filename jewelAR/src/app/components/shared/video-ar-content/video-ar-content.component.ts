@@ -101,13 +101,14 @@ export class VideoArContentComponent implements OnInit {
                   break;
 
                 case "Necklace":
-                  const [necklace_x, necklace_y, necklace_z] = keypoints[136];
+                  const [necklace_x, necklace_y, necklace_z] = keypoints[200];
                   const eyeDistanceForNecklace = this.CalculateEyeDistance(keypoints[282], keypoints[52], width, height);
                   const necklaceImage = new Image();
                   const currentNecklaceImage = this.selectedJewel.image;
                   necklaceImage.src = "data:image/png;base64," + currentNecklaceImage;
                   necklaceImage.onload = (e) => {
-                    ctx.drawImage(necklaceImage, Math.abs(necklace_x - (eyeDistanceForNecklace * 1.8) - 5), necklace_y, eyeDistanceForNecklace * 5, eyeDistanceForNecklace * 5);
+                    ctx.drawImage(necklaceImage, Math.abs(necklace_x - (eyeDistanceForNecklace * 1.8) -5), necklace_y, eyeDistanceForNecklace * 5, eyeDistanceForNecklace * 5);
+                   
                   }
                   break;
 
