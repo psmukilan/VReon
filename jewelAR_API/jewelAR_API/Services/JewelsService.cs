@@ -27,6 +27,9 @@ namespace jewelAR_API.Services
         public async Task<Jewel?> GetAsync(string id) =>
             await _jewelsCollection.Find(x => x.Id == id).FirstOrDefaultAsync();
 
+        public async Task<List<Jewel>> GetByCategoryAsync(string category) =>
+            await _jewelsCollection.Find(x => x.Category == category).ToListAsync();
+
         public async Task CreateAsync(Jewel newJewel) =>
             await _jewelsCollection.InsertOneAsync(newJewel);
 

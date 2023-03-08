@@ -1,3 +1,4 @@
+import { AfterViewInit } from '@angular/core';
 import { Component, ElementRef, OnInit } from '@angular/core';
 import { Router, ActivatedRoute, ParamMap } from '@angular/router';
 import { Observable, from, Subject } from 'rxjs';

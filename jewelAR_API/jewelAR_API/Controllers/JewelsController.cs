@@ -31,6 +31,13 @@ namespace jewelAR_API.Controllers
             return jewel;
         }
 
+        [HttpGet("GetJewelByCategory/{category}")]
+        public async Task<ActionResult<List<Jewel>>> GetJewelByCategory(string category)
+        {
+            var jewel = await _jewelsService.GetByCategoryAsync(category);
+            return jewel;
+        }
+
         [HttpPost]
         public async Task<IActionResult> Post(Jewel newJewel)
         {
