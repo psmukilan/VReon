@@ -55,4 +55,8 @@ export class HomePageComponent implements OnInit {
     const jewelId = jewel ? jewel.id : null;
     this.router.navigate(['/jewel', { id: jewelId }]);
   }
+
+  goToEarringCollection() {
+    this.router.navigate(['/jewel']);
+  }
 }

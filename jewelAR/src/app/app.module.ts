@@ -12,13 +12,16 @@ import { RxReactiveFormsModule } from '@rxweb/reactive-form-validators';
 import { JewelService } from './services/jewel-service';
 import { AppRoutingModule } from './app-routing.module';
 import { JewelPageComponent } from './components/jewel-page/jewel-page.component';
+import { VideoArContentComponent } from './components/shared/video-ar-content/video-ar-content.component';
+import { NgxSpinnerModule } from 'ngx-spinner';
 
 @NgModule({
   declarations: [
     AppComponent,
     HomePageComponent,
     UploadFileModalComponent,
-    JewelPageComponent
+    JewelPageComponent,
+    VideoArContentComponent
     ],
   imports: [
     BrowserModule,
@@ -28,7 +31,8 @@ import { JewelPageComponent } from './components/jewel-page/jewel-page.component
     ReactiveFormsModule,
     NgSelectModule,
     RxReactiveFormsModule,
-    AppRoutingModule
+    AppRoutingModule,
+    NgxSpinnerModule.forRoot({ type: 'square-loader' })
   ],
   providers: [
     JewelService
