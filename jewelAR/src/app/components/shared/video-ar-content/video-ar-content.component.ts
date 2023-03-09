@@ -99,15 +99,15 @@ export class VideoArContentComponent implements OnInit {
                     let eardepth2=Math.abs(earring_z2);
                     if((Math.abs(eardepth1-eardepth2)>40)){
                         if(eardepth1<eardepth2){
-                            ctx.drawImage(earringImage, Math.abs(earring_x1 - eyeDistanceForEarring / 2 - 10), earring_y1, eyeDistanceForEarring, eyeDistanceForEarring);
+                            ctx.drawImage(earringImage,earring_x1 - eyeDistanceForEarring / 2 - 10, earring_y1, eyeDistanceForEarring, eyeDistanceForEarring);
                         }
                         if(eardepth2<eardepth1){
-                            ctx.drawImage(earringImage, Math.abs(earring_x2 - eyeDistanceForEarring / 2 + 10), earring_y2, eyeDistanceForEarring, eyeDistanceForEarring);
+                            ctx.drawImage(earringImage,earring_x2 - eyeDistanceForEarring / 2 + 10, earring_y2, eyeDistanceForEarring, eyeDistanceForEarring);
                         }
                   }
                     else{
-                      ctx.drawImage(earringImage, Math.abs(earring_x1 - eyeDistanceForEarring / 2 - 10), earring_y1, eyeDistanceForEarring, eyeDistanceForEarring);
-                      ctx.drawImage(earringImage, Math.abs(earring_x2 - eyeDistanceForEarring / 2 + 10), earring_y2, eyeDistanceForEarring, eyeDistanceForEarring);
+                      ctx.drawImage(earringImage, earring_x1 - eyeDistanceForEarring / 2 - 10, earring_y1, eyeDistanceForEarring, eyeDistanceForEarring);
+                      ctx.drawImage(earringImage, earring_x2 - eyeDistanceForEarring / 2 + 10, earring_y2, eyeDistanceForEarring, eyeDistanceForEarring);
                     }
                 }
                   break;
@@ -119,7 +119,7 @@ export class VideoArContentComponent implements OnInit {
                   const currentNecklaceImage = this.selectedJewel.image;
                   necklaceImage.src = "data:image/png;base64," + currentNecklaceImage;
                   necklaceImage.onload = (e) => {
-                    ctx.drawImage(necklaceImage, Math.abs(necklace_x - (eyeDistanceForNecklace * 1.8) - 5), necklace_y, eyeDistanceForNecklace * 5, eyeDistanceForNecklace * 5);
+                    ctx.drawImage(necklaceImage, necklace_x - (eyeDistanceForNecklace * 1.8) - 5, necklace_y, eyeDistanceForNecklace * 5, eyeDistanceForNecklace * 5);
                   }
                   break;
 
@@ -130,7 +130,7 @@ export class VideoArContentComponent implements OnInit {
                   const currentNosePinImage = this.selectedJewel.image;
                   nosePinImage.src = "data:image/png;base64," + currentNosePinImage;
                   nosePinImage.onload = (e) => {
-                    ctx.drawImage(nosePinImage, Math.abs(nosePin_x - eyeDistanceForNosePin), Math.abs(nosePin_y - (eyeDistanceForNosePin * 0.9)), eyeDistanceForNosePin * 1.8, eyeDistanceForNosePin * 1.8);
+                    ctx.drawImage(nosePinImage, nosePin_x - eyeDistanceForNosePin,nosePin_y - (eyeDistanceForNosePin * 0.9), eyeDistanceForNosePin * 1.8, eyeDistanceForNosePin * 1.8);
                   }
                   break;
                 
@@ -141,7 +141,7 @@ export class VideoArContentComponent implements OnInit {
                   const currentNethichuttiImage = this.selectedJewel.image;
                   nethichuttiImage.src = "data:image/png;base64," + currentNethichuttiImage;
                   nethichuttiImage.onload = (e) => {
-                    ctx.drawImage(nethichuttiImage, Math.abs(nethichutti_x - (eyeDistanceForNethichutti)), Math.abs(nethichutti_y - (eyeDistanceForNethichutti)), eyeDistanceForNethichutti * 2, eyeDistanceForNethichutti * 2);
+                    ctx.drawImage(nethichuttiImage, nethichutti_x - (eyeDistanceForNethichutti),nethichutti_y - (eyeDistanceForNethichutti), eyeDistanceForNethichutti * 2, eyeDistanceForNethichutti * 2);
                   }
                   break;
               }
