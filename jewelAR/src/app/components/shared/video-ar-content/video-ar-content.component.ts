@@ -95,9 +95,21 @@ export class VideoArContentComponent implements OnInit {
                   const currentEarringImage = this.selectedJewel.image;
                   earringImage.src = "data:image/png;base64," + currentEarringImage;
                   earringImage.onload = (e) => {
-                    ctx.drawImage(earringImage, Math.abs(earring_x1 - eyeDistanceForEarring / 2 - 10), earring_y1, eyeDistanceForEarring, eyeDistanceForEarring);
-                    ctx.drawImage(earringImage, Math.abs(earring_x2 - eyeDistanceForEarring / 2 + 10), earring_y2, eyeDistanceForEarring, eyeDistanceForEarring);
+                    let eardepth1=Math.abs(earring_z1);
+                    let eardepth2=Math.abs(earring_z2);
+                    if((Math.abs(eardepth1-eardepth2)>40)){
+                        if(eardepth1<eardepth2){
+                            ctx.drawImage(earringImage, Math.abs(earring_x1 - eyeDistanceForEarring / 2 - 10), earring_y1, eyeDistanceForEarring, eyeDistanceForEarring);
+                        }
+                        if(eardepth2<eardepth1){
+                            ctx.drawImage(earringImage, Math.abs(earring_x2 - eyeDistanceForEarring / 2 + 10), earring_y2, eyeDistanceForEarring, eyeDistanceForEarring);
+                        }
                   }
+                    else{
+                      ctx.drawImage(earringImage, Math.abs(earring_x1 - eyeDistanceForEarring / 2 - 10), earring_y1, eyeDistanceForEarring, eyeDistanceForEarring);
+                      ctx.drawImage(earringImage, Math.abs(earring_x2 - eyeDistanceForEarring / 2 + 10), earring_y2, eyeDistanceForEarring, eyeDistanceForEarring);
+                    }
+                }
                   break;
 
                 case "Necklace":
