@@ -4,6 +4,10 @@ import { JewelInfo } from 'src/app/models/jewel-info';
 import { JewelService } from 'src/app/services/jewel-service';
 import { NgxSpinnerService } from "ngx-spinner";
 import * as facemesh from '@tensorflow-models/facemesh';
+import * as mpHands from '@tensorflow-models/handpose';
+
+
+
 import '@tensorflow/tfjs-backend-webgl';
 import '@tensorflow/tfjs-backend-cpu';
 
@@ -64,7 +68,7 @@ export class VideoArContentComponent implements OnInit {
 
     // Load the Facemesh model
     const model = await facemesh.load();
-
+    const handpose = await mpHands.load();
     navigator.mediaDevices
       .getUserMedia({ video: true })
       .then(stream => {
@@ -75,16 +79,19 @@ export class VideoArContentComponent implements OnInit {
           // Detect facial landmarks in real-time
           setInterval(async () => {
             const predictions = await model.estimateFaces(video);
+            const handpredictions = await handpose.estimateHands(video);
 
             // Draw the facial landmarks on the canvas
             ctx.clearRect(0, 0, canvas.width, canvas.height);
-            for (let i = 0; i < predictions.length; i++) {
+            for (let i = 0; i < predictions.length ; i++) {
               const keypoints = predictions[i].scaledMesh as any[];
+              
               let width = video.width;
               let height = video.height;
 
               ctx.drawImage(video, 0, 0, video.width, video.height);
               this.isLoading = false;
+              
 
               switch (this.selectedJewel.category) {
                 case "Earring":
@@ -121,7 +128,36 @@ export class VideoArContentComponent implements OnInit {
                   necklaceImage.onload = (e) => {
                     ctx.drawImage(necklaceImage, necklace_x - (eyeDistanceForNecklace * 1.8) - 5, necklace_y, eyeDistanceForNecklace * 5, eyeDistanceForNecklace * 5);
                   }
+                  
                   break;
+
+                  case "Ring":
+                    for(let i=0; i<handpredictions.length ;i++){
+                    const handkeys = handpredictions[i].landmarks as any[];
+                    const [ring_x,ring_y,ring_z]= handkeys[14]  ;
+                    const eyeDistanceForRing = this.CalculateEyeDistance(handkeys[5], handkeys[17], width, height);
+                    const RingImage = new Image();
+                    const currentRingImage = this.selectedJewel.image;
+                    RingImage.src = "data:image/png;base64," + currentRingImage;
+                    RingImage.onload = (e) => {
+                      ctx.drawImage(RingImage, ring_x-50 , ring_y, eyeDistanceForRing, eyeDistanceForRing);
+                     
+                    }}
+                    break;
+
+                    case "Watch":
+                    for(let i=0; i<handpredictions.length ;i++){
+                    const handkeys = handpredictions[i].landmarks as any[];
+                    const [watch_x,watch_y,watch_z]= handkeys[0]  ;
+                    const eyeDistanceForWatch = this.CalculateEyeDistance(handkeys[5], handkeys[17], width, height);
+                    const watchImage = new Image();
+                    const currentWatchImage = this.selectedJewel.image;
+                    watchImage.src = "data:image/png;base64," + currentWatchImage;
+                    watchImage.onload = (e) => {
+                      ctx.drawImage(watchImage, watch_x/2 , watch_y, eyeDistanceForWatch * 5, eyeDistanceForWatch * 5);
+                     
+                    }}
+                    break;
 
                 case "Nosepin":
                   const [nosePin_x, nosePin_y, nosePin_z] = keypoints[457];
