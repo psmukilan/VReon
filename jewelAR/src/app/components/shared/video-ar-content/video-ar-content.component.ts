@@ -11,6 +11,7 @@ import * as mpHands from '@tensorflow-models/handpose';
 import '@tensorflow/tfjs-backend-webgl';
 import '@tensorflow/tfjs-backend-cpu';
 
+
 @Component({
   selector: 'app-video-ar-content',
   templateUrl: './video-ar-content.component.html',
@@ -133,29 +134,35 @@ export class VideoArContentComponent implements OnInit {
 
                   case "Ring":
                     for(let i=0; i<handpredictions.length ;i++){
-                    const handkeys = handpredictions[i].landmarks as any[];
+                    
+                    const handkeys = handpredictions[i].landmarks;
+                    
                     const [ring_x,ring_y,ring_z]= handkeys[14]  ;
                     const eyeDistanceForRing = this.CalculateEyeDistance(handkeys[5], handkeys[17], width, height);
                     const RingImage = new Image();
                     const currentRingImage = this.selectedJewel.image;
                     RingImage.src = "data:image/png;base64," + currentRingImage;
                     RingImage.onload = (e) => {
-                      ctx.drawImage(RingImage, ring_x-50 , ring_y, eyeDistanceForRing, eyeDistanceForRing);
-                     
+                      ctx.drawImage(RingImage, ring_x - eyeDistanceForRing/2 , ring_y, eyeDistanceForRing, eyeDistanceForRing);
+                      
                     }}
                     break;
 
                     case "Watch":
                     for(let i=0; i<handpredictions.length ;i++){
                     const handkeys = handpredictions[i].landmarks as any[];
-                    const [watch_x,watch_y,watch_z]= handkeys[0]  ;
+                    const [watch_x,watch_y,watch_z]= handkeys[0];
+                    const [fin_x,fin_y,fin_z]=handkeys[17];
                     const eyeDistanceForWatch = this.CalculateEyeDistance(handkeys[5], handkeys[17], width, height);
+                    const handrotation = Math.abs(watch_y-fin_y);
+                    const handgyro =Math.abs(handrotation-eyeDistanceForWatch);
+                    console.log(handrotation,eyeDistanceForWatch);
                     const watchImage = new Image();
                     const currentWatchImage = this.selectedJewel.image;
                     watchImage.src = "data:image/png;base64," + currentWatchImage;
                     watchImage.onload = (e) => {
-                      ctx.drawImage(watchImage, watch_x/2 , watch_y, eyeDistanceForWatch * 5, eyeDistanceForWatch * 5);
-                     
+                      ctx.drawImage(watchImage, watch_x -  eyeDistanceForWatch*2, watch_y, eyeDistanceForWatch * 5, eyeDistanceForWatch * 5);
+                      
                     }}
                     break;
 
@@ -198,6 +205,7 @@ export class VideoArContentComponent implements OnInit {
     const y2 = leftEye[1];
     return Math.sqrt((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1));
   }
+  
 
   changeJewel(jewel: JewelInfo) {
     this.selectedJewel = jewel;
