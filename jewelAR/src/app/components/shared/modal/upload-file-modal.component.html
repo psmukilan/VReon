@@ -1,0 +1,75 @@
+<div class="modal-header" style="background-color: rgb(55, 135, 226);">
+  <h4 class="modal-title pull-left" style="color: white;">{{ title }}</h4>
+  <button
+    type="button"
+    class="btn btn-dark close pull-right"
+    aria-label="Close"
+    (click)="modalService.hide()"
+  >
+    <span aria-hidden="true">&times;</span>
+  </button>
+</div>
+<div class="modal-body" style="padding: 30px;">
+  <form [formGroup]="jewelFormGroup">
+    <div class="row">
+      <div class="col-6">
+        <label class="form-label" for="category">Category</label>
+        <ng-select
+          id="category"
+          [items]="jewelCategories"
+          [closeOnSelect]="true"
+          formControlName="category"
+        ></ng-select>
+      </div>
+      <div class="col-6">
+        <label class="form-label" for="purity">Purity</label>
+        <ng-select
+          id="purity"
+          [items]="jewelPurity"
+          [closeOnSelect]="true"
+          formControlName="purity"
+        ></ng-select>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-6">
+        <label class="form-label" for="weight">Weight</label>
+        <input
+          id="weight"
+          class="form-control"
+          formControlName="weight"
+          placeholder="Enter Weight"
+        />
+      </div>
+      <div class="col-6">
+        <label class="form-label" for="price">Price</label>
+        <input
+          id="price"
+          class="form-control"
+          formControlName="price"
+          placeholder="Enter Price"
+        />
+      </div>
+    </div>
+    <div class="row" style="padding-top: 30px;">
+      <label class="form-label" for="image">Image</label>
+      <input
+        id="image"
+        class="form-control col-12"
+        formControlName="image"
+        [writeFile]="true"
+        type="file"
+        ng-file-model="files"
+        (change)="onFileSelected($event)"
+      />
+    </div>
+  </form>
+</div>
+<div class="modal-footer">
+  <button type="button" class="btn btn-primary" (click)="submit()">
+    Submit
+  </button>
+  <button type="button" class="btn btn-danger" (click)="cancel()">
+    Cancel
+  </button>
+</div>

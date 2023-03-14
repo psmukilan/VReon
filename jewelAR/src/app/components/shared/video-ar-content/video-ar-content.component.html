@@ -1,0 +1,19 @@
+<div>
+    <div style="padding-top: 10%; padding-bottom: 10%;">
+        <div *ngIf="isLoading" class="spinner-border text-secondary" role="status">
+            <span class="sr-only"></span>
+        </div>
+        <video id="video" hidden="hidden" width="640" height="480"></video>
+        <canvas id="canvas" width="640" height="480"></canvas>
+        <div style="width: 640px; height:130px; background-color: lightgray;">
+            <button class="btn" (click)="goLeft()"><img src="../../../../assets/left-arrow.png" width="10px"></button>
+            <ng-container *ngFor="let jewel of jewelsToDisplay">
+                <button class="btn btn-dark" style="margin: 8px;" (click)="changeJewel(jewel)">
+                    <img src="data:image/png;base64,{{ jewel.image }}" width="100px" height="100px">
+                </button>
+            </ng-container>
+            <button style="rotate: 180deg;" class="btn" (click)="goRight()"><img src="../../../../assets/left-arrow.png"
+                    width="10px"></button>
+        </div>
+    </div>
+</div>
