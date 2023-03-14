@@ -35,8 +35,8 @@ export class JewelPageComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    this.detectLandmarks();
-    this.getJewelInfo();
+    //this.detectLandmarks();
+    //this.getJewelInfo();
   }
 
   getJewelInfo() {

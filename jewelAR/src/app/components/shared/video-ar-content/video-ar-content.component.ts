@@ -5,7 +5,7 @@ import { JewelService } from 'src/app/services/jewel-service';
 import { NgxSpinnerService } from "ngx-spinner";
 import * as facemesh from '@tensorflow-models/facemesh';
 import * as mpHands from '@tensorflow-models/handpose';
-
+//import * as handPoseDetection from '@tensorflow-models/hand-pose-detection';
 
 
 import '@tensorflow/tfjs-backend-webgl';
@@ -60,12 +60,21 @@ export class VideoArContentComponent implements OnInit {
       });
   }
 
+
+  
   async detectLandmarks() {
     this.isLoading = true;
     this.spinner.show();
     const video = document.getElementById('video') as HTMLVideoElement;
     const canvas = document.getElementById('canvas') as HTMLCanvasElement;
     const ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
+
+//    const modelhand = handPoseDetection.SupportedModels.MediaPipeHands;
+//const detectorConfig = {
+  //runtime: 'tfjs', // or 'tfjs'
+  //modelType: 'full'
+//};
+//const detector = await handPoseDetection.createDetector(modelhand, detectorConfig);
 
     // Load the Facemesh model
     const model = await facemesh.load();
@@ -80,7 +89,7 @@ export class VideoArContentComponent implements OnInit {
           // Detect facial landmarks in real-time
           setInterval(async () => {
             const predictions = await model.estimateFaces(video);
-            const handpredictions = await handpose.estimateHands(video);
+            
 
             // Draw the facial landmarks on the canvas
             ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -133,9 +142,10 @@ export class VideoArContentComponent implements OnInit {
                   break;
 
                   case "Ring":
-                    for(let i=0; i<handpredictions.length ;i++){
+                    const handpredictionsring = await handpose.estimateHands(video);
+                    for(let i=0; i<handpredictionsring.length ;i++){
                     
-                    const handkeys = handpredictions[i].landmarks;
+                    const handkeys = handpredictionsring[i].landmarks;
                     
                     const [ring_x,ring_y,ring_z]= handkeys[14]  ;
                     const eyeDistanceForRing = this.CalculateEyeDistance(handkeys[5], handkeys[17], width, height);
@@ -149,8 +159,9 @@ export class VideoArContentComponent implements OnInit {
                     break;
 
                     case "Watch":
-                    for(let i=0; i<handpredictions.length ;i++){
-                    const handkeys = handpredictions[i].landmarks as any[];
+                      const handpredictionswatch = await handpose.estimateHands(video);
+                    for(let i=0; i<handpredictionswatch.length ;i++){
+                    const handkeys = handpredictionswatch[i].landmarks as any[];
                     const [watch_x,watch_y,watch_z]= handkeys[0];
                     const [fin_x,fin_y,fin_z]=handkeys[17];
                     const eyeDistanceForWatch = this.CalculateEyeDistance(handkeys[5], handkeys[17], width, height);
