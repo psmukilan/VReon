@@ -13,7 +13,6 @@ import { JewelService } from './services/jewel-service';
 import { AppRoutingModule } from './app-routing.module';
 import { JewelPageComponent } from './components/jewel-page/jewel-page.component';
 import { VideoArContentComponent } from './components/shared/video-ar-content/video-ar-content.component';
-import { NgxSpinnerModule } from 'ngx-spinner';
 
 @NgModule({
   declarations: [
@@ -32,7 +31,6 @@ import { NgxSpinnerModule } from 'ngx-spinner';
     NgSelectModule,
     RxReactiveFormsModule,
     AppRoutingModule,
-    NgxSpinnerModule.forRoot({ type: 'square-loader' })
   ],
   providers: [
     JewelService

@@ -3,9 +3,7 @@ import { BsModalService, BsModalRef, ModalOptions } from 'ngx-bootstrap/modal';
 import { JewelInfo } from 'src/app/models/jewel-info';
 import { JewelService } from 'src/app/services/jewel-service';
 import { UploadFileModalComponent } from '../shared/modal/upload-file-modal.component';
-import { ActivatedRoute, Router } from '@angular/router';
-import { Observable } from 'rxjs';
-import { switchMap } from 'rxjs/operators';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-home-page',

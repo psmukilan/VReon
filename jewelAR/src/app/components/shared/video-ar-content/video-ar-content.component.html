@@ -1,19 +1,144 @@
-<div>
-    <div style="padding-top: 10%; padding-bottom: 10%;">
-        <div *ngIf="isLoading" class="spinner-border text-secondary" role="status">
-            <span class="sr-only"></span>
+<div class="row">
+    <!-- Model Image -->
+    <div class="col-3">
+        <ng-container>
+            <img id="image" src="../../../../assets/model-image.png">
+        </ng-container>
+        <canvas class="add-padding" style="float: right;" id="imageCanvas" width="269" height="480"></canvas>
+        <button class="btn btn-dark" (click)="uploadImage()">
+            <h6><i class="fa-solid fa-upload"></i> Upload Image</h6>
+        </button>
+    </div>
+
+    <!-- Live AR Video -->
+    <div class="col-6">
+        <!-- Image to enable video -->
+        <div *ngIf="!showVideo">
+            <button class="btn add-padding" (click)="enableVideo()">
+                <img src="../../../../assets/try-on.png" width="auto" height="auto">
+            </button>
         </div>
-        <video id="video" hidden="hidden" width="640" height="480"></video>
-        <canvas id="canvas" width="640" height="480"></canvas>
-        <div style="width: 640px; height:130px; background-color: lightgray;">
-            <button class="btn" (click)="goLeft()"><img src="../../../../assets/left-arrow.png" width="10px"></button>
-            <ng-container *ngFor="let jewel of jewelsToDisplay">
-                <button class="btn btn-dark" style="margin: 8px;" (click)="changeJewel(jewel)">
-                    <img src="data:image/png;base64,{{ jewel.image }}" width="100px" height="100px">
-                </button>
-            </ng-container>
-            <button style="rotate: 180deg;" class="btn" (click)="goRight()"><img src="../../../../assets/left-arrow.png"
-                    width="10px"></button>
+        <!-- Live Video Canvas -->
+        <div class="center">
+            <div *ngIf="isLoading" class="spinner-border text-secondary" role="status">
+                <span class="sr-only"></span>
+            </div>
+            <video id="video" hidden="hidden" width="640" height="480"></video>
+            <canvas class="add-padding" id="canvas" hidden="hideCanvas" width="640" height="480"></canvas>
+        </div>
+        <!-- Utility buttons for Video -->
+        <div class="center">
+            <button *ngIf="showVideo && !isLoading" class="btn btn-dark" style="margin-left: 2%; margin-bottom: 2%;"
+                (click)="captureImage()">
+                <h6><i class="fas fa-camera"></i> Capture</h6>
+            </button>
+            <button *ngIf="showVideo && !isLoading" class="btn btn-dark" style="margin-left: 2%; margin-bottom: 2%;"
+                (click)="enableFullScreenMode()">
+                <h6><i class="fa-solid fa-maximize"></i> FullScreen</h6>
+            </button>
+            <button *ngIf="showVideo && !isLoading" class="btn btn-dark" style="margin-left: 2%; margin-bottom: 2%;"
+                (click)="enableCompareMode()">
+                <h6><i class="fa-solid fa-arrow-right-arrow-left"></i> Compare</h6>
+            </button>
+            <button *ngIf="showVideo && !isLoading && capturedImages && capturedImages.length" class="btn btn-dark"
+                style="margin-left: 2%; margin-bottom: 2%;" (click)="viewCapturedPictures()">
+                <h6><i class="fa-solid fa-image"></i> View Images</h6>
+            </button>
         </div>
     </div>
+
+    <div class="col-3"></div>
 </div>
+
+<!-- Jewellery Gallery -->
+<div style="width: 100%; background-color: lightgray;">
+    <button class="btn" (click)="goLeft()"><img src="../../../../assets/left-arrow.png" width="10px"></button>
+    <ng-container *ngFor="let jewel of jewelsToDisplay">
+        <button class="btn btn-dark col-1" style="margin: 8px;" (click)="changeJewel(jewel)">
+            <img src="data:image/png;base64,{{ jewel.image }}" width="100px" height="100px">
+        </button>
+    </ng-container>
+    <button style="rotate: 180deg;" class="btn" (click)="goRight()"><img src="../../../../assets/left-arrow.png"
+            width="10px"></button>
+</div>
+
+<!-- Dual Video Compare -->
+<div [ngStyle]="{'width': isCompareModeOn ? '100%' : '0%'}" class="full-screen">
+    <button class="btn btn-danger" (click)="disableCompareMode()" style="float: right; margin: 1%"><i
+            class="fa-solid fa-xmark"></i></button>
+    <video id="videoForComparison1" hidden="true" width="640" height="480"></video>
+    <button class="btn" (click)="toggleVideoInFocus(1)">
+        <canvas style="margin: 2%" hidden="true" id="canvasForComparison1" width="640" height="480"></canvas>
+    </button>
+    <video id="videoForComparison2" hidden="true" width="640" height="480"></video>
+    <button class="btn" (click)="toggleVideoInFocus(2)">
+        <canvas style="margin: 2%" hidden="true" id="canvasForComparison2" width="640" height="480"></canvas>
+    </button>
+    <div *ngIf="isCompareModeOn" style="background-color: lightgray;">
+        <button class="btn" (click)="goLeft()"><img src="../../../../assets/left-arrow.png" width="10px"></button>
+        <ng-container *ngFor="let jewel of jewelsToDisplay">
+            <button class="btn btn-dark col-1" style="margin: 8px;" (click)="changeJewelForVideoInFocus(jewel)">
+                <img src="data:image/png;base64,{{ jewel.image }}" width="100px" height="100px">
+            </button>
+        </ng-container>
+        <button style="rotate: 180deg;" class="btn" (click)="goRight()"><img src="../../../../assets/left-arrow.png"
+                width="10px"></button>
+    </div>
+</div>
+
+<!-- View Captured Images -->
+<div [ngStyle]="{'width': viewCapturedImages ? '100%' : '0%'}" class="full-screen">
+    <button class="btn btn-danger" (click)="exitFullScreen()" style="float: right; margin: 1%"><i
+            class="fa-solid fa-xmark"></i></button>
+    <div class="row" style="margin-top: 5vh; margin-left: 5vw; margin-right: 5vw;">
+        <div class="col-1 center">
+            <button *ngIf="viewCapturedImages" class="btn" (click)="prevImage()"><img
+                    src="../../../../assets/left-arrow-white.png" width="30px"></button>
+        </div>
+        <div *ngIf="viewCapturedImages" class="col-10" style="display: flex; justify-content: center;">
+            <img src="{{ currentCapturedImage }}">
+        </div>
+        <div class="col-1 center">
+            <button *ngIf="viewCapturedImages" style="rotate: 180deg;" class="btn" (click)="nextImage()"><img
+                    src="../../../../assets/left-arrow-white.png" width="30px"></button>
+        </div>
+    </div>
+    <div *ngIf="viewCapturedImages">
+        <ng-container *ngFor="let image of capturedImages">
+            <button class="btn btn-light" (click)="viewSelectedImage(image)" style="margin: 1%;">
+                <img src="{{ image }}" width="160px" height="120px">
+            </button>
+        </ng-container>
+    </div>
+</div>
+
+<!-- Image Upload Modal -->
+<ng-template #showImageUploadModal>
+    <div class="modal-header" style="background-color: rgb(52, 51, 51)">
+        <h4 class="modal-title pull-left" style="color: white;"> Upload Image </h4>
+        <button type="button" class="btn btn-dark close pull-right" aria-label="Close" (click)="hideImageUploadModal()">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div class="modal-body" style="padding: 30px;">
+        <div class="row" style="padding-top: 30px;">
+            <label class="form-label" for="image">Image To Upload</label>
+            <input
+              id="image"
+              class="form-control col-12"
+              [writeFile]="true"
+              type="file"
+              ng-file-model="files"
+              (change)="onImageSelected($event)"
+            />
+          </div>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-primary" (click)="submit()">
+          Submit
+        </button>
+        <button type="button" class="btn btn-danger" (click)="cancel()">
+          Cancel
+        </button>
+      </div>
+</ng-template>

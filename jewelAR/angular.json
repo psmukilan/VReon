@@ -26,15 +26,13 @@
               "src/styles.css",
               "./node_modules/bootstrap/dist/css/bootstrap.min.css",
               "./node_modules/@ng-select/ng-select/themes/material.theme.css",
-              "./node_modules/ngx-spinner/animations/square-loader.css"
+              "./node_modules/@fortawesome/fontawesome-free/css/fontawesome.css",
+              "./node_modules/@fortawesome/fontawesome-free/css/solid.css"
             ],
             "scripts": [
-              "node_modules/jquery/dist/jquery.js",
-              "node_modules/popper.js/dist/umd/popper.min.js",
               "./node_modules/bootstrap/dist/js/bootstrap.bundle.min.js",
-              "src/assets/camera_utils.js",
-              "src/assets/modelviewer.js",
-              "src/app/components/jewel-page/face-detection.js"
+              "./node_modules/@fortawesome/fontawesome-free/js/fontawesome.js",
+              "./node_modules/@fortawesome/fontawesome-free/js/solid.js"
             ]
           },
           "configurations": {
