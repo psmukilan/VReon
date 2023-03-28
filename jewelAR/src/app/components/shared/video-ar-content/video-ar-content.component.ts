@@ -3,6 +3,9 @@ import { ActivatedRoute } from '@angular/router';
 import { JewelInfo } from 'src/app/models/jewel-info';
 import { JewelService } from 'src/app/services/jewel-service';
 import * as facemesh from '@tensorflow-models/facemesh';
+import * as bodypose from '@tensorflow-models/posenet';
+import '@tensorflow/tfjs-core';
+import '@tensorflow/tfjs-converter';
 import '@tensorflow/tfjs-backend-webgl';
 import '@tensorflow/tfjs-backend-cpu';
 import { DetectJewel } from '../../../models/detectJewel';
@@ -118,6 +121,8 @@ export class VideoArContentComponent implements OnInit {
 
     // Load the Facemesh model
     const model = await facemesh.load();
+    // load body pose model
+    const bodymodel = await bodypose.load();
 
     navigator.mediaDevices
       .getUserMedia({ video: true })
@@ -130,11 +135,28 @@ export class VideoArContentComponent implements OnInit {
           this.intervalId = setInterval(async () => {
             if (this.detectJewelOnMainCanvas) {
               const predictions = await model.estimateFaces(inputVideo);
+              const bodypredictions = await bodymodel.estimateSinglePose(inputVideo);
+              if (bodypredictions){
+                for(let i=0;i<bodypredictions.keypoints.length;i++){
+                  const posepoints=bodypredictions.keypoints as any[];                 
+                  
+                  jewelArray.forEach((jewel) => {
+                    
+                    this.drawdressoncanvas(jewel,inputCanvasContext,posepoints);
+                  })
+
+              }
+            }
               if (predictions && predictions.length) {
                 // Draw the facial landmarks on the canvas
                 inputCanvasContext.clearRect(0, 0, inputVideo.width, inputVideo.height);
                 for (let i = 0; i < predictions.length; i++) {
+                  // const posepoints = bodypredictions.keypoints[5];
+                  // const shoulder_x= posepoints.position.x;
+                  // const shoulder_y= bodypredictions.keypoints[5].position.y;
+                  // console.log(shoulder_x,shoulder_y);
                   const keypoints = predictions[i].scaledMesh as any[];
+                  
                   let width = inputVideo.width;
                   let height = inputVideo.height;
 
@@ -143,6 +165,7 @@ export class VideoArContentComponent implements OnInit {
 
                   jewelArray.forEach((jewel) => {
                     this.drawJewelOnCanvas(jewel, inputCanvasContext, keypoints, width, height);
+                    
                   })
                 }
               }
@@ -153,9 +176,51 @@ export class VideoArContentComponent implements OnInit {
                 inputCanvasContext.drawImage(noFaceImage, 0, 0, noFaceImage.width, noFaceImage.height);
               }
             }
-          }, 200);
+          }, 350);
         }
       });
+  }
+
+  drawdressoncanvas(jewel: JewelInfo,ctx: CanvasRenderingContext2D, posepoints: any[]){
+    
+    switch(jewel.category){
+      case "Shirts":
+        const leftshoulder_x=posepoints[5].position.x;
+        const leftshoulder_y= posepoints[5].position.y;
+        const rightshoulder_x=posepoints[6].position.x;
+        const rightshoulder_y=posepoints[6].position.y;
+        const shirtpoint_x= (rightshoulder_x+leftshoulder_x)/2;
+        const shirtpoint_y = (rightshoulder_y+leftshoulder_y)/2;
+        const size= Math.sqrt((rightshoulder_x - leftshoulder_x) ** 2 + (rightshoulder_y - leftshoulder_y) ** 2);
+
+        const shirtimage= new Image();
+        const currentShirtImage= jewel.image;
+        shirtimage.src= "data:image/png;base64," + currentShirtImage;
+        shirtimage.onload = (e)=>{
+          ctx.drawImage(shirtimage,shirtpoint_x-(size/1.02),shirtpoint_y-(size/2.7),size*2,size*2);
+        }
+               
+        break;
+
+      case "Tops":
+        const left_x=posepoints[5].position.x;
+        const left_y= posepoints[5].position.y;
+        const right_x=posepoints[6].position.x;
+        const right_y=posepoints[6].position.y;
+        const toppoint_x= (right_x+left_x)/2;
+        const toppoint_y = (right_y+left_y)/2;
+        const topsize= Math.sqrt((right_x - left_x) ** 2 + (right_y - left_y) ** 2);
+
+        const topimage= new Image();
+        const currenttopImage= jewel.image;
+        topimage.src= "data:image/png;base64," + currenttopImage;
+        topimage.onload = (e)=>{
+          ctx.drawImage(topimage,toppoint_x-(topsize/0.8),toppoint_y-(topsize/1.2),topsize*2.5,topsize*2.5);
+        }
+               
+        break;
+    }
+
   }
 
   drawJewelOnCanvas(jewel: JewelInfo, ctx: CanvasRenderingContext2D, keypoints: any[], width: number, height: number) {
@@ -163,19 +228,36 @@ export class VideoArContentComponent implements OnInit {
       case "Earring":
         const [earring_x1, earring_y1, earring_z1] = keypoints[93];
         const [earring_x2, earring_y2, earring_z2] = keypoints[323];
-        const eyeDistanceForEarring = this.CalculateEyeDistance(keypoints[282], keypoints[52], width, height);
+        const eyeDistanceForEarring = this.CalculateEyeDistance(keypoints[282], keypoints[52]);
         const earringImage = new Image();
         const currentEarringImage = jewel.image;
         earringImage.src = "data:image/png;base64," + currentEarringImage;
         earringImage.onload = (e) => {
-          ctx.drawImage(earringImage, Math.abs(earring_x1 - eyeDistanceForEarring / 2 - 10), earring_y1, eyeDistanceForEarring, eyeDistanceForEarring);
-          ctx.drawImage(earringImage, Math.abs(earring_x2 - eyeDistanceForEarring / 2 + 10), earring_y2, eyeDistanceForEarring, eyeDistanceForEarring);
+          let eardepth1=Math.abs(earring_z1);
+          let eardepth2=Math.abs(earring_z2);
+          if((Math.abs(eardepth1-eardepth2)>40)){
+              if(eardepth1<eardepth2){
+                  ctx.drawImage(earringImage,earring_x1 - eyeDistanceForEarring / 2 - 10, earring_y1, eyeDistanceForEarring, eyeDistanceForEarring);
+              }
+              if(eardepth2<eardepth1){
+                  ctx.drawImage(earringImage, earring_x2 - eyeDistanceForEarring / 2 + 10, earring_y2, eyeDistanceForEarring, eyeDistanceForEarring);
+              }
+        }
+          else{
+            ctx.drawImage(earringImage,earring_x1 - eyeDistanceForEarring / 2 - 10, earring_y1, eyeDistanceForEarring, eyeDistanceForEarring);
+            ctx.drawImage(earringImage,earring_x2 - eyeDistanceForEarring / 2 + 10, earring_y2, eyeDistanceForEarring, eyeDistanceForEarring);
+          }
         }
         break;
 
+      case "shirt":
+        
+        break;
+
+
       case "Necklace":
         const [necklace_x, necklace_y, necklace_z] = keypoints[136];
-        const eyeDistanceForNecklace = this.CalculateEyeDistance(keypoints[282], keypoints[52], width, height);
+        const eyeDistanceForNecklace = this.CalculateEyeDistance(keypoints[282], keypoints[52]);
         const necklaceImage = new Image();
         const currentNecklaceImage = jewel.image;
         necklaceImage.src = "data:image/png;base64," + currentNecklaceImage;
@@ -186,23 +268,23 @@ export class VideoArContentComponent implements OnInit {
 
       case "Nosepin":
         const [nosePin_x, nosePin_y, nosePin_z] = keypoints[457];
-        const eyeDistanceForNosePin = this.CalculateEyeDistance(keypoints[282], keypoints[52], width, height);
+        const eyeDistanceForNosePin = this.CalculateEyeDistance(keypoints[282], keypoints[52]);
         const nosePinImage = new Image();
         const currentNosePinImage = jewel.image;
         nosePinImage.src = "data:image/png;base64," + currentNosePinImage;
         nosePinImage.onload = (e) => {
-          ctx.drawImage(nosePinImage, Math.abs(nosePin_x - eyeDistanceForNosePin), Math.abs(nosePin_y - (eyeDistanceForNosePin * 0.9)), eyeDistanceForNosePin * 1.8, eyeDistanceForNosePin * 1.8);
+          ctx.drawImage(nosePinImage,nosePin_x - eyeDistanceForNosePin, nosePin_y - (eyeDistanceForNosePin * 0.9), eyeDistanceForNosePin * 1.8, eyeDistanceForNosePin * 1.8);
         }
         break;
 
       case "Nethichutti":
         const [nethichutti_x, nethichutti_y, nethichutti_z] = keypoints[10];
-        const eyeDistanceForNethichutti = this.CalculateEyeDistance(keypoints[282], keypoints[52], width, height);
+        const eyeDistanceForNethichutti = this.CalculateEyeDistance(keypoints[282], keypoints[52] );
         const nethichuttiImage = new Image();
         const currentNethichuttiImage = jewel.image;
         nethichuttiImage.src = "data:image/png;base64," + currentNethichuttiImage;
         nethichuttiImage.onload = (e) => {
-          ctx.drawImage(nethichuttiImage, Math.abs(nethichutti_x - (eyeDistanceForNethichutti)), Math.abs(nethichutti_y - (eyeDistanceForNethichutti)), eyeDistanceForNethichutti * 2, eyeDistanceForNethichutti * 2);
+          ctx.drawImage(nethichuttiImage,nethichutti_x - (eyeDistanceForNethichutti), nethichutti_y - (eyeDistanceForNethichutti), eyeDistanceForNethichutti * 2, eyeDistanceForNethichutti * 2);
         }
         break;
     }
@@ -213,7 +295,7 @@ export class VideoArContentComponent implements OnInit {
     this.getCameraAccess();
   }
 
-  CalculateEyeDistance(rightEye: any[], leftEye: any[], width: number, height: number): number {
+  CalculateEyeDistance(rightEye: any[], leftEye: any[]): number {
     const x1 = rightEye[0];
     const y1 = rightEye[1];
     const x2 = leftEye[0];
