@@ -220,7 +220,7 @@ export class VideoArContentComponent implements OnInit {
         const currentNecklaceImage = jewel.image;
         necklaceImage.src = "data:image/png;base64," + currentNecklaceImage;
         necklaceImage.onload = (e) => {
-          ctx.drawImage(necklaceImage, necklace_x - (eyeDistanceForNecklace * 1.8), necklace_y, eyeDistanceForNecklace * 5, eyeDistanceForNecklace * 5);
+          ctx.drawImage(necklaceImage, necklace_x - (eyeDistanceForNecklace * 2), necklace_y, eyeDistanceForNecklace * 5, eyeDistanceForNecklace * 5);
         }
         break;
 
