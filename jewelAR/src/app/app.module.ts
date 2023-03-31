@@ -11,7 +11,6 @@ import { NgSelectModule } from '@ng-select/ng-select';
 import { RxReactiveFormsModule } from '@rxweb/reactive-form-validators';
 import { JewelService } from './services/jewel-service';
 import { AppRoutingModule } from './app-routing.module';
-import { JewelPageComponent } from './components/jewel-page/jewel-page.component';
 import { VideoArContentComponent } from './components/shared/video-ar-content/video-ar-content.component';
 
 @NgModule({
@@ -19,7 +18,6 @@ import { VideoArContentComponent } from './components/shared/video-ar-content/vi
     AppComponent,
     HomePageComponent,
     UploadFileModalComponent,
-    JewelPageComponent,
     VideoArContentComponent
     ],
   imports: [

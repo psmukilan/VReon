@@ -42,7 +42,7 @@ export class VideoArContentComponent implements OnInit {
   uploadedImage: string = "";
   bsModalRef!: BsModalRef;
 
-  @ViewChild('showImageUploadModal', { read: TemplateRef }) showImageUploadModal !:TemplateRef<any>;
+  @ViewChild('showImageUploadModal', { read: TemplateRef }) showImageUploadModal !: TemplateRef<any>;
 
   constructor(
     private route: ActivatedRoute,
@@ -71,7 +71,6 @@ export class VideoArContentComponent implements OnInit {
 
   getJewelInfo() {
     this.isLoading = true;
-    const jewelId = this.route.snapshot.paramMap.get('id');
     this.jewelService.GetAllJewels().subscribe((jewel) => {
       this.jewels = jewel;
       this.isLoading = false;
@@ -91,15 +90,6 @@ export class VideoArContentComponent implements OnInit {
     const imageString = canvas.toDataURL();
     this.uploadedImage = imageString;
     this.detectLandmarksOnImage();
-    // this.http.get('../../../../assets/model-image.png', { responseType: 'blob' }).subscribe(blob => {
-    //   const reader = new FileReader();
-    //   reader.readAsDataURL(blob);
-    //   reader.onloadend = () => {
-    //     const base64String = reader.result.toString().split(',')[1];
-    //     this.uploadedImage = "data:image/png;base64," + base64String;
-    //     this.detectLandmarksOnImage();
-    //   };
-    // });
   }
 
   getCameraAccess() {
@@ -156,6 +146,56 @@ export class VideoArContentComponent implements OnInit {
           }, 200);
         }
       });
+  }
+
+  drawJewelOnImageCanvas(jewel: JewelInfo, ctx: CanvasRenderingContext2D, keypoints: any[], width: number, height: number) {
+    switch (jewel.category) {
+      case "Earring":
+        const [earring_x1, earring_y1, earring_z1] = keypoints[93];
+        const [earring_x2, earring_y2, earring_z2] = keypoints[323];
+        const eyeDistanceForEarring = this.CalculateEyeDistance(keypoints[282], keypoints[52], width, height);
+        const earringImage = new Image();
+        const currentEarringImage = jewel.image;
+        earringImage.src = "data:image/png;base64," + currentEarringImage;
+        earringImage.onload = (e) => {
+          ctx.drawImage(earringImage, Math.abs(earring_x1 - eyeDistanceForEarring / 2 - 10), earring_y1, eyeDistanceForEarring, eyeDistanceForEarring);
+          ctx.drawImage(earringImage, Math.abs(earring_x2 - eyeDistanceForEarring / 2 + 10), earring_y2, eyeDistanceForEarring, eyeDistanceForEarring);
+        }
+        break;
+
+      case "Necklace":
+        const [necklace_x, necklace_y, necklace_z] = keypoints[136];
+        const eyeDistanceForNecklace = this.CalculateEyeDistance(keypoints[282], keypoints[52], width, height);
+        const necklaceImage = new Image();
+        const currentNecklaceImage = jewel.image;
+        necklaceImage.src = "data:image/png;base64," + currentNecklaceImage;
+        necklaceImage.onload = (e) => {
+          ctx.drawImage(necklaceImage, necklace_x - (eyeDistanceForNecklace * 1.8), necklace_y, eyeDistanceForNecklace * 5, eyeDistanceForNecklace * 5);
+        }
+        break;
+
+      case "Nosepin":
+        const [nosePin_x, nosePin_y, nosePin_z] = keypoints[457];
+        const eyeDistanceForNosePin = this.CalculateEyeDistance(keypoints[282], keypoints[52], width, height);
+        const nosePinImage = new Image();
+        const currentNosePinImage = jewel.image;
+        nosePinImage.src = "data:image/png;base64," + currentNosePinImage;
+        nosePinImage.onload = (e) => {
+          ctx.drawImage(nosePinImage, Math.abs(nosePin_x - eyeDistanceForNosePin), Math.abs(nosePin_y - (eyeDistanceForNosePin * 0.9)), eyeDistanceForNosePin * 1.8, eyeDistanceForNosePin * 1.8);
+        }
+        break;
+
+      case "Nethichutti":
+        const [nethichutti_x, nethichutti_y, nethichutti_z] = keypoints[10];
+        const eyeDistanceForNethichutti = this.CalculateEyeDistance(keypoints[282], keypoints[52], width, height);
+        const nethichuttiImage = new Image();
+        const currentNethichuttiImage = jewel.image;
+        nethichuttiImage.src = "data:image/png;base64," + currentNethichuttiImage;
+        nethichuttiImage.onload = (e) => {
+          ctx.drawImage(nethichuttiImage, Math.abs(nethichutti_x - (eyeDistanceForNethichutti)), Math.abs(nethichutti_y - (eyeDistanceForNethichutti)), eyeDistanceForNethichutti * 2, eyeDistanceForNethichutti * 2);
+        }
+        break;
+    }
   }
 
   drawJewelOnCanvas(jewel: JewelInfo, ctx: CanvasRenderingContext2D, keypoints: any[], width: number, height: number) {
@@ -304,6 +344,19 @@ export class VideoArContentComponent implements OnInit {
     clearInterval(this.intervalId);
   }
 
+  disableVideoStream() {
+    this.stopInterval();
+    const stream = this.video.srcObject as MediaStream;
+    const tracks = stream.getTracks();
+
+    tracks.forEach((track) => {
+      track.stop();
+    });
+    this.video.srcObject = null;
+    this.canvas.hidden = true;
+    this.showVideo = false;
+  }
+
   enableCompareMode() {
     this.isCompareModeOn = true;
     this.detectJewelOnMainCanvas = false;
@@ -327,6 +380,8 @@ export class VideoArContentComponent implements OnInit {
 
   disableCompareMode() {
     this.isCompareModeOn = false;
+    this.detectJewelsOnVideo1.cancelTimer();
+    this.detectJewelsOnVideo2.cancelTimer();
     const canvasForComparison1 = document.getElementById('canvasForComparison1') as HTMLCanvasElement;
     const canvasForComparison2 = document.getElementById('canvasForComparison2') as HTMLCanvasElement;
     canvasForComparison1.hidden = true;
@@ -361,7 +416,7 @@ export class VideoArContentComponent implements OnInit {
   }
 
   viewCapturedPictures() {
-    if(this.capturedImages && this.capturedImages.length){
+    if (this.capturedImages && this.capturedImages.length) {
       this.viewCapturedImages = true;
     }
   }
@@ -373,7 +428,7 @@ export class VideoArContentComponent implements OnInit {
 
   nextImage() {
     const index = this.capturedImages.findIndex(x => x == this.currentCapturedImage);
-    this.currentCapturedImage = index <= this.capturedImages.length - 2 && index >=0 ? this.capturedImages[index + 1] : this.currentCapturedImage;
+    this.currentCapturedImage = index <= this.capturedImages.length - 2 && index >= 0 ? this.capturedImages[index + 1] : this.currentCapturedImage;
   }
 
   viewSelectedImage(image: string) {
@@ -412,7 +467,7 @@ export class VideoArContentComponent implements OnInit {
   }
 
   isUploadedImageAvailable() {
-    if(this.uploadedImage != ""){
+    if (this.uploadedImage != "") {
       return true;
     }
     else {
@@ -429,5 +484,22 @@ export class VideoArContentComponent implements OnInit {
   cancel() {
     this.imageToBeUploaded = "";
     this.bsModalService.hide();
+  }
+
+  showCollection(category: string) {
+    this.isLoading = true;
+    if (category == "All") {
+      this.getJewelInfo();
+    }
+    else {
+      this.jewelService.GetJewelsByCategory(category).subscribe((jewel) => {
+        this.jewels = jewel;
+        this.isLoading = false;
+        this.jewelsToDisplay = this.jewels.length > this.jewelDisplayConstant ? this.jewels.slice(this.currentStartPosition, this.jewelDisplayConstant) : this.jewels;
+        this.selectedJewel = [];
+        this.selectedJewel.push(this.jewels[0]);
+        this.detectLandmarksOnImage();
+      });
+    }
   }
 }

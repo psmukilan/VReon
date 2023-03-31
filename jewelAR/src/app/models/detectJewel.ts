@@ -6,6 +6,7 @@ import '@tensorflow/tfjs-backend-cpu';
 export class DetectJewel {
     public selectedJewels: JewelInfo[] = [];
     public enableJewelDetection: Boolean = true;
+    public intervalId!: NodeJS.Timer;
 
     constructor() {}
 
@@ -21,7 +22,7 @@ export class DetectJewel {
                 //Start the webcam stream
                 inputVideo.onloadeddata = (e) => {
                     // Detect facial landmarks in real-time
-                    setInterval(async () => {
+                    this.intervalId = setInterval(async () => {
                         if (this.enableJewelDetection) {
                             const predictions = await model.estimateFaces(inputVideo);
                             if (predictions && predictions.length) {
@@ -49,6 +50,10 @@ export class DetectJewel {
                     }, 200);
                 }
             });
+    }
+
+    cancelTimer() {
+        clearInterval(this.intervalId);
     }
 
     drawJewelOnCanvas(jewel: JewelInfo, ctx: CanvasRenderingContext2D, keypoints: any[], width: number, height: number) {
