@@ -219,6 +219,23 @@ export class VideoArContentComponent implements OnInit {
         }
                
         break;
+      
+      case "Pants":
+        const lefthip_x = posepoints[11].position.x;
+        const lefthip_y = posepoints[11].position.y;
+        const righthip_x= posepoints[12].position.x;
+        const righthip_y = posepoints[12].position.y;
+        const midhip_x=(righthip_x+lefthip_x)/2;
+        const midhip_y=(righthip_y+lefthip_y)/2;
+        const hipsize=Math.sqrt((righthip_x-lefthip_x)**2 + (righthip_y+lefthip_y)**2);
+
+        const pantimage = new Image();
+        const currentpantImage = jewel.image;
+        pantimage.src =  "data:image/png;base64," + currentpantImage;
+        pantimage.onload = (e)=>{
+          ctx.drawImage(pantimage,midhip_x-(hipsize),midhip_y,hipsize,hipsize);
+        }
+        break;
     }
 
   }
@@ -250,9 +267,7 @@ export class VideoArContentComponent implements OnInit {
         }
         break;
 
-      case "shirt":
-        
-        break;
+      
 
 
       case "Necklace":
@@ -287,6 +302,8 @@ export class VideoArContentComponent implements OnInit {
           ctx.drawImage(nethichuttiImage,nethichutti_x - (eyeDistanceForNethichutti), nethichutti_y - (eyeDistanceForNethichutti), eyeDistanceForNethichutti * 2, eyeDistanceForNethichutti * 2);
         }
         break;
+
+      
     }
   }
 
