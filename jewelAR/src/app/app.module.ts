@@ -12,6 +12,8 @@ import { RxReactiveFormsModule } from '@rxweb/reactive-form-validators';
 import { JewelService } from './services/jewel-service';
 import { AppRoutingModule } from './app-routing.module';
 import { VideoArContentComponent } from './components/shared/video-ar-content/video-ar-content.component';
+import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 @NgModule({
   declarations: [
@@ -29,6 +31,8 @@ import { VideoArContentComponent } from './components/shared/video-ar-content/vi
     NgSelectModule,
     RxReactiveFormsModule,
     AppRoutingModule,
+    BrowserAnimationsModule,
+    NgbModule
   ],
   providers: [
     JewelService

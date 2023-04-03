@@ -52,15 +52,28 @@
       </div>
     </div>
     <div class="row" style="padding-top: 30px;">
-      <label class="form-label" for="image">Image</label>
+      <label class="form-label" for="image">Try On Image</label>
       <input
-        id="image"
+        id="tryOnImage"
         class="form-control col-12"
-        formControlName="image"
+        formControlName="tryOnImage"
         [writeFile]="true"
         type="file"
         ng-file-model="files"
         (change)="onFileSelected($event)"
+      />
+    </div>
+    <div class="row" style="padding-top: 30px;">
+      <label class="form-label" for="image">Display Images</label>
+      <input
+        id="displayImages"
+        class="form-control col-12"
+        formControlName="displayImages"
+        [writeFile]="true"
+        type="file"
+        multiple="true"
+        ng-file-model="files"
+        (change)="onDisplayImageSelected($event)"
       />
     </div>
   </form>
