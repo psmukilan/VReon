@@ -6,4 +6,5 @@ export class JewelInfo{
     weight!: number;
     price!: number;
     image!: string;
+    displayImages!: string[];
 }

@@ -10,7 +10,7 @@
     <!-- Live AR Video -->
     <div class="col-6">
         <!-- Image to enable video -->
-        <div *ngIf="!showVideo">
+        <div class="center" *ngIf="!showVideo">
             <button class="btn add-padding" (click)="enableVideo()">
                 <img src="../../../../assets/try-on.png" width="auto" height="auto">
             </button>
@@ -47,21 +47,40 @@
             </button>
         </div>
     </div>
-
-    <div class="col-3"></div>
+    <!-- Image Carousel -->
+    <div class="col-3">
+        <div class="card add-padding" style="width: 18rem;">
+            <ngb-carousel>
+                <ng-template ngbSlide *ngFor="let image of images">
+                    <div class="wrapper card-img-top" style="width: 18rem; height: auto;">
+                        <img [src]="image" style="width: 100%" alt="Random first slide">
+                    </div>
+                </ng-template>
+            </ngb-carousel>
+            <div class="card-body">
+              <h5 class="card-title">Card title</h5>
+              <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
+            </div>
+          </div>
+    </div>
 </div>
 
 <div style="background-image: url('../../../assets/gold-line.jpg');">
-    <input type="checkbox" class="btn-check" id="btn-check-2-outlined" checked autocomplete="off">
-    <label style="margin: 3px" class="btn btn-outline-dark" (click)="showCollection('All')" for="btn-check-2-outlined">All Categories</label>
-    <input type="checkbox" class="btn-check" id="btn-check-2-outlined" unchecked autocomplete="off">
-    <label style="margin: 3px" class="btn btn-outline-dark" (click)="showCollection('Earring')" for="btn-check-2-outlined">Earrings</label>
-    <input type="checkbox" class="btn-check" id="btn-check-2-outlined" unchecked autocomplete="off">
-    <label style="margin: 3px" class="btn btn-outline-dark" (click)="showCollection('Necklace')" for="btn-check-2-outlined">Necklace</label>
-    <input type="checkbox" class="btn-check" id="btn-check-2-outlined" unchecked autocomplete="off">
-    <label style="margin: 3px" class="btn btn-outline-dark" (click)="showCollection('Nethichutti')" for="btn-check-2-outlined">Nethichutti</label>
-    <input type="checkbox" class="btn-check" id="btn-check-2-outlined" unchecked autocomplete="off">
-    <label style="margin: 3px" class="btn btn-outline-dark" (click)="showCollection('Nosepin')" for="btn-check-2-outlined">Nosepin</label>
+    <input type="checkbox" class="btn-check" id="btn-check-2-outlined" [checked]="isAllJewelChecked" autocomplete="off">
+    <label style="margin: 3px" class="btn btn-outline-dark" (click)="showCollection('All')"
+        for="btn-check-2-outlined">All Categories</label>
+    <input type="checkbox" class="btn-check" id="btn-check-2-outlined" [checked]="isEarringChecked" autocomplete="off">
+    <label style="margin: 3px" class="btn btn-outline-dark" (click)="showCollection('Earring')"
+        for="btn-check-2-outlined">Earrings</label>
+    <input type="checkbox" class="btn-check" id="btn-check-2-outlined" [checked]="isNecklaceChecked" autocomplete="off">
+    <label style="margin: 3px" class="btn btn-outline-dark" (click)="showCollection('Necklace')"
+        for="btn-check-2-outlined">Necklace</label>
+    <input type="checkbox" class="btn-check" id="btn-check-2-outlined" [checked]="isNethichuttiChecked" autocomplete="off">
+    <label style="margin: 3px" class="btn btn-outline-dark" (click)="showCollection('Nethichutti')"
+        for="btn-check-2-outlined">Nethichutti</label>
+    <input type="checkbox" class="btn-check" id="btn-check-2-outlined" [checked]="isNosepinChecked" autocomplete="off">
+    <label style="margin: 3px" class="btn btn-outline-dark" (click)="showCollection('Nosepin')"
+        for="btn-check-2-outlined">Nosepin</label>
 </div>
 
 <!-- Jewellery Gallery -->

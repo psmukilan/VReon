@@ -20,7 +20,8 @@ export class UploadFileModalComponent implements OnInit {
   title: string | undefined;
   message: string | undefined;
   options: string[] = [];
-  selectedFiles!: string;
+  selectedTryOnImage!: string;
+  selectedDisplayImages: string[] = [];
   jewelFormGroup!: FormGroup;
   jewelImageFormGroup!: FormGroup;
   jewelCategories = JewelProperties.categories;
@@ -46,7 +47,8 @@ export class UploadFileModalComponent implements OnInit {
       purity: ['', Validators.required],
       weight: ['', Validators.required],
       price: ['', Validators.required],
-      image: new FormControl(null, [Validators.required]),
+      tryOnImage: new FormControl(null, [Validators.required]),
+      displayImages: new FormControl(null, [Validators.required]),
     });
   }
 
@@ -72,7 +74,7 @@ export class UploadFileModalComponent implements OnInit {
     jewelInfo.weight = formValues.weight;
     jewelInfo.price = formValues.price;
     jewelInfo.jewellerId = '640062ee872031def6feed85';
-    jewelInfo.image = this.selectedFiles;
+    jewelInfo.image = this.selectedTryOnImage;
     return jewelInfo;
   }
 
@@ -82,13 +84,27 @@ export class UploadFileModalComponent implements OnInit {
       var reader = new FileReader();
 
       reader.onload = this.handleFile.bind(this);
-
       reader.readAsBinaryString(file);
     }
   }
 
   handleFile(event: any) {
     var binaryString = event.target.result;
-    this.selectedFiles = btoa(binaryString);
+    this.selectedTryOnImage = btoa(binaryString);
+  }
+
+  handleDisplayImageSelection(event: any) {
+    var binaryString = event.target.result;
+    var imageString = btoa(binaryString);
+    this.selectedDisplayImages.push(imageString);
+  }
+
+  onDisplayImageSelected(event: any) {
+    let file = event.target.files[0];
+    if (file) {
+      var reader = new FileReader();
+      reader.onload = this.handleFile.bind(this);
+      reader.readAsBinaryString(file);
+    }
   }
 }

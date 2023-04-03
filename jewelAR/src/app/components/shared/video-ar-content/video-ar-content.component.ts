@@ -41,6 +41,17 @@ export class VideoArContentComponent implements OnInit {
   imageToBeUploaded!: string;
   uploadedImage: string = "";
   bsModalRef!: BsModalRef;
+  isEarringChecked: Boolean = false;
+  isNecklaceChecked: Boolean = false;
+  isNosepinChecked: Boolean = false;
+  isNethichuttiChecked: Boolean = false;
+  isAllJewelChecked: Boolean = true;
+  previousXKeyPoint!: number;
+  previousYKeyPoint!: number;
+  images = ["../../../../assets/earring-multiple-images/img1.jpg",
+    "../../../../assets/earring-multiple-images/img2.jpg",
+    "../../../../assets/earring-multiple-images/img3.jpg",
+    "../../../../assets/earring-multiple-images/img4.jpg"];
 
   @ViewChild('showImageUploadModal', { read: TemplateRef }) showImageUploadModal !: TemplateRef<any>;
 
@@ -116,24 +127,31 @@ export class VideoArContentComponent implements OnInit {
         inputVideo.play();
         //Start the webcam stream
         inputVideo.onloadeddata = (e) => {
+          inputCanvasContext.clearRect(0, 0, inputVideo.width, inputVideo.height);
           // Detect facial landmarks in real-time
           this.intervalId = setInterval(async () => {
             if (this.detectJewelOnMainCanvas) {
               const predictions = await model.estimateFaces(inputVideo);
               if (predictions && predictions.length) {
                 // Draw the facial landmarks on the canvas
-                inputCanvasContext.clearRect(0, 0, inputVideo.width, inputVideo.height);
                 for (let i = 0; i < predictions.length; i++) {
                   const keypoints = predictions[i].scaledMesh as any[];
                   let width = inputVideo.width;
                   let height = inputVideo.height;
-
                   inputCanvasContext.drawImage(this.video, 0, 0, width, height);
                   this.isLoading = false;
 
+                  const referenceXKeyPoint = keypoints[168][0];
+                  const referenceYKeyPoint = keypoints[168][1];
+                  if (referenceXKeyPoint < (this.previousXKeyPoint - 10) || referenceXKeyPoint > (this.previousXKeyPoint + 10)) {
+                    
+                  }
                   jewelArray.forEach((jewel) => {
                     this.drawJewelOnCanvas(jewel, inputCanvasContext, keypoints, width, height);
                   })
+                  
+                  this.previousXKeyPoint = referenceXKeyPoint;
+                  this.previousYKeyPoint = referenceYKeyPoint;
                 }
               }
               else {
@@ -487,11 +505,13 @@ export class VideoArContentComponent implements OnInit {
   }
 
   showCollection(category: string) {
+    console.log(this.isAllJewelChecked);
     this.isLoading = true;
     if (category == "All") {
       this.getJewelInfo();
     }
     else {
+      this.toggleJewelCategory(category);
       this.jewelService.GetJewelsByCategory(category).subscribe((jewel) => {
         this.jewels = jewel;
         this.isLoading = false;
@@ -500,6 +520,56 @@ export class VideoArContentComponent implements OnInit {
         this.selectedJewel.push(this.jewels[0]);
         this.detectLandmarksOnImage();
       });
+    }
+  }
+
+  toggleJewelCategory(category: string) {
+    switch (category) {
+      case "Earring":
+        this.isEarringChecked = !this.isEarringChecked;
+        if (this.isEarringChecked) {
+          this.isNecklaceChecked = false;
+          this.isNethichuttiChecked = false;
+          this.isNosepinChecked = false;
+          this.isAllJewelChecked = false;
+        }
+        break;
+      case "Necklace":
+        this.isNecklaceChecked = !this.isNecklaceChecked;
+        if (this.isNecklaceChecked) {
+          this.isEarringChecked = false;
+          this.isNethichuttiChecked = false;
+          this.isNosepinChecked = false;
+          this.isAllJewelChecked = false;
+        }
+        break;
+      case "Nethichutti":
+        this.isNethichuttiChecked = !this.isNethichuttiChecked;
+        if (this.isNethichuttiChecked) {
+          this.isEarringChecked = false;
+          this.isNecklaceChecked = false;
+          this.isNosepinChecked = false;
+          this.isAllJewelChecked = false;
+        }
+        break;
+      case "Nosepin":
+        this.isNosepinChecked = !this.isNosepinChecked;
+        if (this.isNosepinChecked) {
+          this.isEarringChecked = false;
+          this.isNecklaceChecked = false;
+          this.isNethichuttiChecked = false;
+          this.isAllJewelChecked = false;
+        }
+        break;
+      case "All":
+        this.isAllJewelChecked = !this.isAllJewelChecked;
+        if (this.isAllJewelChecked) {
+          this.isEarringChecked = false;
+          this.isNecklaceChecked = false;
+          this.isNethichuttiChecked = false;
+          this.isNosepinChecked = false;
+        }
+        break;
     }
   }
 }
