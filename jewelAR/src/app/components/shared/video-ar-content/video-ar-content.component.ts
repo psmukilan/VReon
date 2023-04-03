@@ -12,6 +12,7 @@ import { DetectJewel } from '../../../models/detectJewel';
 import { BsModalService, BsModalRef, ModalOptions } from 'ngx-bootstrap/modal';
 import { HttpClient } from '@angular/common/http';
 
+
 @Component({
   selector: 'app-video-ar-content',
   templateUrl: './video-ar-content.component.html',
@@ -201,6 +202,24 @@ export class VideoArContentComponent implements OnInit {
         }
                
         break;
+
+        case "frock":
+          const leftfrog_x=posepoints[5].position.x;
+          const leftfrog_y= posepoints[5].position.y;
+          const rightfrog_x=posepoints[6].position.x;
+          const rightfrog_y=posepoints[6].position.y;
+          const frogpoint_x= (rightfrog_x+leftfrog_x)/2;
+          const frogpoint_y = (rightfrog_y+leftfrog_y)/2;
+          const frogsize= Math.sqrt((rightfrog_x - leftfrog_x) ** 2 + (rightfrog_y - leftfrog_y) ** 2);
+  
+          const frogimage= new Image();
+          const currentfrogImage= jewel.image;
+          frogimage.src= "data:image/png;base64," + currentfrogImage;
+          frogimage.onload = (e)=>{
+            ctx.drawImage(frogimage,frogpoint_x-(frogsize/0.9),frogpoint_y-(frogsize/3.2),frogsize*2.3,frogsize*4);
+          }
+                 
+          break;
 
       case "Tops":
         const left_x=posepoints[5].position.x;
