@@ -1,5 +1,6 @@
 {
   "dependencies": {
-    "@tensorflow-models/posenet": "^2.2.2"
+    "@tensorflow-models/posenet": "^2.2.2",
+    "@types/p5": "^1.6.0"
   }
 }

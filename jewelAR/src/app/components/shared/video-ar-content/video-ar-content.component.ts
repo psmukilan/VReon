@@ -8,6 +8,8 @@ import '@tensorflow/tfjs-core';
 import '@tensorflow/tfjs-converter';
 import '@tensorflow/tfjs-backend-webgl';
 import '@tensorflow/tfjs-backend-cpu';
+
+
 import { DetectJewel } from '../../../models/detectJewel';
 import { BsModalService, BsModalRef, ModalOptions } from 'ngx-bootstrap/modal';
 import { HttpClient } from '@angular/common/http';
@@ -66,7 +68,10 @@ export class VideoArContentComponent implements OnInit {
     this.imageCanvas = document.getElementById('imageCanvas') as HTMLCanvasElement;
     this.imageCanvasContext = this.imageCanvas.getContext('2d') as CanvasRenderingContext2D;
   }
+   
 
+ 
+ 
   initializeVideoARElements() {
     this.video = document.getElementById('video') as HTMLVideoElement;
     this.canvas = document.getElementById('canvas') as HTMLCanvasElement;
@@ -133,6 +138,7 @@ export class VideoArContentComponent implements OnInit {
         //Start the webcam stream
         inputVideo.onloadeddata = (e) => {
           // Detect facial landmarks in real-time
+          
           this.intervalId = setInterval(async () => {
             if (this.detectJewelOnMainCanvas) {
               const predictions = await model.estimateFaces(inputVideo);
