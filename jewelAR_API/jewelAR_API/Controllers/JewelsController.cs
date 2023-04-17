@@ -31,10 +31,18 @@ namespace jewelAR_API.Controllers
             return jewel;
         }
 
-        [HttpGet("GetJewelByCategory/{category}")]
-        public async Task<ActionResult<List<Jewel>>> GetJewelByCategory(string category)
+        [HttpGet("GetJewelsByCategory/{category}")]
+        public async Task<ActionResult<List<Jewel>>> GetJewelsByCategory(string category)
         {
             var jewel = await _jewelsService.GetByCategoryAsync(category);
+            return jewel;
+        }
+
+        [HttpGet("GetJewelsByCategories/{category}")]
+        public async Task<ActionResult<List<Jewel>>> GetJewelsByCategories(string category)
+        {
+            var categories = category.Split(',');
+            var jewel = await _jewelsService.GetByCategoriesAsync(categories);
             return jewel;
         }
 

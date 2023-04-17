@@ -1,5 +1,6 @@
 ﻿using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
+using MongoDB.Bson.Serialization.Serializers;
 
 namespace jewelAR_API.Models
 {
@@ -14,5 +15,6 @@ namespace jewelAR_API.Models
         public decimal Weight { get; set; }
         public decimal Price { get; set; }
         public string Image { get; set; }
+        public string[] DisplayImages { get; set; }
     }
 }

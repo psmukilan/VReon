@@ -23,7 +23,6 @@ export class UploadFileModalComponent implements OnInit {
   selectedTryOnImage!: string;
   selectedDisplayImages: string[] = [];
   jewelFormGroup!: FormGroup;
-  jewelImageFormGroup!: FormGroup;
   jewelCategories = JewelProperties.categories;
   jewelPurity = JewelProperties.purity;
   private _jewelService;
@@ -75,6 +74,7 @@ export class UploadFileModalComponent implements OnInit {
     jewelInfo.price = formValues.price;
     jewelInfo.jewellerId = '640062ee872031def6feed85';
     jewelInfo.image = this.selectedTryOnImage;
+    jewelInfo.displayImages = this.selectedDisplayImages;
     return jewelInfo;
   }
 
@@ -100,11 +100,14 @@ export class UploadFileModalComponent implements OnInit {
   }
 
   onDisplayImageSelected(event: any) {
-    let file = event.target.files[0];
-    if (file) {
-      var reader = new FileReader();
-      reader.onload = this.handleFile.bind(this);
-      reader.readAsBinaryString(file);
+    let files = event.target.files as FileList;
+
+    if (files && files.length) {
+        Array.from(files).forEach((file) => {
+        var reader = new FileReader();
+        reader.onload = this.handleDisplayImageSelection.bind(this);
+        reader.readAsBinaryString(file);
+      });
     }
   }
 }

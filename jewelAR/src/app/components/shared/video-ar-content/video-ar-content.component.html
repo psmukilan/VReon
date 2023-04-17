@@ -51,36 +51,39 @@
     <div class="col-3">
         <div class="card add-padding" style="width: 18rem;">
             <ngb-carousel>
-                <ng-template ngbSlide *ngFor="let image of images">
+                <ng-template ngbSlide *ngFor="let image of displayImages">
                     <div class="wrapper card-img-top" style="width: 18rem; height: auto;">
-                        <img [src]="image" style="width: 100%" alt="Random first slide">
+                        <img src="data:image/png;base64,{{ image }}" style="width: 100%" alt="Random first slide">
                     </div>
                 </ng-template>
             </ngb-carousel>
             <div class="card-body">
-              <h5 class="card-title">Card title</h5>
-              <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
+                <h5 class="card-title">{{ selectedJewel[0].category }}</h5>
+                <p class="card-text">Some quick example text to build on the card title and make up the bulk of the
+                    card's content.</p>
             </div>
-          </div>
+        </div>
     </div>
 </div>
 
 <div style="background-image: url('../../../assets/gold-line.jpg');">
-    <input type="checkbox" class="btn-check" id="btn-check-2-outlined" [checked]="isAllJewelChecked" autocomplete="off">
-    <label style="margin: 3px" class="btn btn-outline-dark" (click)="showCollection('All')"
-        for="btn-check-2-outlined">All Categories</label>
-    <input type="checkbox" class="btn-check" id="btn-check-2-outlined" [checked]="isEarringChecked" autocomplete="off">
-    <label style="margin: 3px" class="btn btn-outline-dark" (click)="showCollection('Earring')"
-        for="btn-check-2-outlined">Earrings</label>
-    <input type="checkbox" class="btn-check" id="btn-check-2-outlined" [checked]="isNecklaceChecked" autocomplete="off">
-    <label style="margin: 3px" class="btn btn-outline-dark" (click)="showCollection('Necklace')"
-        for="btn-check-2-outlined">Necklace</label>
-    <input type="checkbox" class="btn-check" id="btn-check-2-outlined" [checked]="isNethichuttiChecked" autocomplete="off">
-    <label style="margin: 3px" class="btn btn-outline-dark" (click)="showCollection('Nethichutti')"
-        for="btn-check-2-outlined">Nethichutti</label>
-    <input type="checkbox" class="btn-check" id="btn-check-2-outlined" [checked]="isNosepinChecked" autocomplete="off">
-    <label style="margin: 3px" class="btn btn-outline-dark" (click)="showCollection('Nosepin')"
-        for="btn-check-2-outlined">Nosepin</label>
+    <form [formGroup]="jewelCategoryFormGroup">
+        <input type="checkbox" class="btn-check" formControlName="All">
+        <label style="margin: 3px" class="btn btn-outline-dark" (click)="toggleCheckBoxes('All')"
+            for="btn-check-2-outlined">All Categories</label>
+        <input type="checkbox" class="btn-check" formControlName="Earring">
+        <label style="margin: 3px" class="btn btn-outline-dark" (click)="toggleCheckBoxes('Earring')"
+            for="btn-check-2-outlined">Earrings</label>
+        <input type="checkbox" class="btn-check" formControlName="Necklace">
+        <label style="margin: 3px" class="btn btn-outline-dark" (click)="toggleCheckBoxes('Necklace')"
+            for="btn-check-2-outlined">Necklace</label>
+        <input type="checkbox" class="btn-check" formControlName="Nethichutti">
+        <label style="margin: 3px" class="btn btn-outline-dark" (click)="toggleCheckBoxes('Nethichutti')"
+            for="btn-check-2-outlined">Nethichutti</label>
+        <input type="checkbox" class="btn-check" formControlName="Nosepin">
+        <label style="margin: 3px" class="btn btn-outline-dark" (click)="toggleCheckBoxes('Nosepin')"
+            for="btn-check-2-outlined">Nosepin</label>
+    </form>
 </div>
 
 <!-- Jewellery Gallery -->
@@ -145,7 +148,7 @@
     </div>
 </div>
 <div><img src="../../../assets/gold-line.jpg" width="100%"></div>
-<div class="row" style="background-color: rgb(39, 38, 38); display: flex;">
+<!-- <div class="row" style="background-color: rgb(39, 38, 38); display: flex;">
     <div class="col-6">
         <button class="btn" (click)="showCollection('Earring')" style="background-color: rgb(39, 38, 38); margin: 5vw">
             <img style="width: 40vw; height: auto;" src="../../../../assets/earrings-collection.png">
@@ -166,20 +169,6 @@
         <button class="btn" (click)="showCollection('Nosepin')" style="background-color: rgb(39, 38, 38); margin: 5vw">
             <img style="width: 40vw; height: auto;" src="../../../../assets/nosepin-collection.png">
         </button>
-    </div>
-</div>
-<!-- <div class="row"> -->
-<!-- <div class="col" *ngFor="let jewel of jewelInfo">
-        <div class="card" style="width: 18rem;">
-            <img src="data:image/png;base64,{{ jewel.image }}" style="max-width: 300px; height: auto;"
-                class="card-img-top">
-            <div class="card-body">
-                <h5 class="card-title">{{ jewel.category }}</h5>
-                <p class="card-text">Some quick example text to build on the card title and make up the bulk of the
-                    card's content.</p>
-                <a class="btn btn-primary" (click)="goToJewelPage(jewel)">Go somewhere</a>
-            </div>
-        </div>
     </div>
 </div> -->
 

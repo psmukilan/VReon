@@ -10,7 +10,8 @@ import { JewelInfo } from "../models/jewel-info";
 export class JewelService {
     private postJewelInfoUrl = 'https://localhost:7292/api/Jewels';
     private getAllJewelsUrl = 'https://localhost:7292/api/Jewels';
-    private getJewelsByCategoryUrl = 'https://localhost:7292/api/Jewels/GetJewelByCategory/';
+    private getJewelsByCategoryUrl = 'https://localhost:7292/api/Jewels/GetJewelsByCategory/';
+    private getJewelsByCategoriesUrl = 'https://localhost:7292/api/Jewels/GetJewelsByCategories/';
 
     constructor(private http: HttpClient) {}
 
@@ -28,5 +29,10 @@ export class JewelService {
 
     GetJewelsByCategory(category: string): Observable<JewelInfo[]> {
         return this.http.get<JewelInfo[]>(this.getJewelsByCategoryUrl + category);
+    }
+
+    GetJewelsByCategories(categories: string[]): Observable<JewelInfo[]> {
+        const category = categories.join(',');
+        return this.http.get<JewelInfo[]>(this.getJewelsByCategoriesUrl + category);
     }
 }

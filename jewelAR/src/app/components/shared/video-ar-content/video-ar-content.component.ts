@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, TemplateRef, ViewChild } from '@angular/core';
+import { Component, Input, OnInit, SimpleChanges, TemplateRef, ViewChild } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { JewelInfo } from 'src/app/models/jewel-info';
 import { JewelService } from 'src/app/services/jewel-service';
@@ -8,6 +8,7 @@ import '@tensorflow/tfjs-backend-cpu';
 import { DetectJewel } from '../../../models/detectJewel';
 import { BsModalService, BsModalRef, ModalOptions } from 'ngx-bootstrap/modal';
 import { HttpClient } from '@angular/common/http';
+import { FormBuilder, FormControl, FormGroup } from '@angular/forms';
 
 @Component({
   selector: 'app-video-ar-content',
@@ -52,6 +53,9 @@ export class VideoArContentComponent implements OnInit {
     "../../../../assets/earring-multiple-images/img2.jpg",
     "../../../../assets/earring-multiple-images/img3.jpg",
     "../../../../assets/earring-multiple-images/img4.jpg"];
+  displayImages: string[] = [];
+  jewelCategoryFormGroup!: FormGroup;
+  selectedJewelCategories: string[] = [];
 
   @ViewChild('showImageUploadModal', { read: TemplateRef }) showImageUploadModal !: TemplateRef<any>;
 
@@ -59,10 +63,12 @@ export class VideoArContentComponent implements OnInit {
     private route: ActivatedRoute,
     private jewelService: JewelService,
     private bsModalService: BsModalService,
-    private http: HttpClient
+    private http: HttpClient,
+    private formBuilder: FormBuilder
   ) { }
 
   ngOnInit(): void {
+    this.jewelCategoryFormGroup = this.initForm();
     this.initializeVideoARElements();
     this.initializeImageARElements();
     this.getJewelInfo();
@@ -78,6 +84,16 @@ export class VideoArContentComponent implements OnInit {
     this.video = document.getElementById('video') as HTMLVideoElement;
     this.canvas = document.getElementById('canvas') as HTMLCanvasElement;
     this.videoCanvasContext = this.canvas.getContext('2d') as CanvasRenderingContext2D;
+  }
+
+  initForm() {
+    return this.formBuilder.group({
+      All: new FormControl(true),
+      Earring: new FormControl(false),
+      Necklace: new FormControl(false),
+      Nethichutti: new FormControl(false),
+      Nosepin: new FormControl(false),
+    });
   }
 
   getJewelInfo() {
@@ -144,12 +160,12 @@ export class VideoArContentComponent implements OnInit {
                   const referenceXKeyPoint = keypoints[168][0];
                   const referenceYKeyPoint = keypoints[168][1];
                   if (referenceXKeyPoint < (this.previousXKeyPoint - 10) || referenceXKeyPoint > (this.previousXKeyPoint + 10)) {
-                    
+
                   }
                   jewelArray.forEach((jewel) => {
                     this.drawJewelOnCanvas(jewel, inputCanvasContext, keypoints, width, height);
                   })
-                  
+
                   this.previousXKeyPoint = referenceXKeyPoint;
                   this.previousYKeyPoint = referenceYKeyPoint;
                 }
@@ -289,11 +305,13 @@ export class VideoArContentComponent implements OnInit {
       else {
         this.selectedJewel.splice(jewelIndex, 1);
         this.selectedJewel.push(jewel);
+        this.displayImages = jewel.displayImages;
         this.detectLandmarksOnImage();
       }
     }
     else {
       this.selectedJewel.push(jewel);
+      this.displayImages = jewel.displayImages;
       this.detectLandmarksOnImage();
     }
   }
@@ -504,18 +522,20 @@ export class VideoArContentComponent implements OnInit {
     this.bsModalService.hide();
   }
 
-  showCollection(category: string) {
-    console.log(this.isAllJewelChecked);
-    this.isLoading = true;
-    if (category == "All") {
-      this.getJewelInfo();
+  showCollection() {
+    if (this.selectedJewelCategories.length == 0) {
+      this.jewelService.GetAllJewels().subscribe((jewel) => {
+        this.jewels = jewel;
+        this.jewelsToDisplay = this.jewels.length > this.jewelDisplayConstant ? this.jewels.slice(0, this.jewelDisplayConstant) : this.jewels;
+        this.selectedJewel = [];
+        this.selectedJewel.push(this.jewels[0]);
+        this.detectLandmarksOnImage();
+      });
     }
     else {
-      this.toggleJewelCategory(category);
-      this.jewelService.GetJewelsByCategory(category).subscribe((jewel) => {
+      this.jewelService.GetJewelsByCategories(this.selectedJewelCategories).subscribe((jewel) => {
         this.jewels = jewel;
-        this.isLoading = false;
-        this.jewelsToDisplay = this.jewels.length > this.jewelDisplayConstant ? this.jewels.slice(this.currentStartPosition, this.jewelDisplayConstant) : this.jewels;
+        this.jewelsToDisplay = this.jewels.length > this.jewelDisplayConstant ? this.jewels.slice(0, this.jewelDisplayConstant) : this.jewels;
         this.selectedJewel = [];
         this.selectedJewel.push(this.jewels[0]);
         this.detectLandmarksOnImage();
@@ -523,53 +543,39 @@ export class VideoArContentComponent implements OnInit {
     }
   }
 
-  toggleJewelCategory(category: string) {
-    switch (category) {
-      case "Earring":
-        this.isEarringChecked = !this.isEarringChecked;
-        if (this.isEarringChecked) {
-          this.isNecklaceChecked = false;
-          this.isNethichuttiChecked = false;
-          this.isNosepinChecked = false;
-          this.isAllJewelChecked = false;
-        }
-        break;
-      case "Necklace":
-        this.isNecklaceChecked = !this.isNecklaceChecked;
-        if (this.isNecklaceChecked) {
-          this.isEarringChecked = false;
-          this.isNethichuttiChecked = false;
-          this.isNosepinChecked = false;
-          this.isAllJewelChecked = false;
-        }
-        break;
-      case "Nethichutti":
-        this.isNethichuttiChecked = !this.isNethichuttiChecked;
-        if (this.isNethichuttiChecked) {
-          this.isEarringChecked = false;
-          this.isNecklaceChecked = false;
-          this.isNosepinChecked = false;
-          this.isAllJewelChecked = false;
-        }
-        break;
-      case "Nosepin":
-        this.isNosepinChecked = !this.isNosepinChecked;
-        if (this.isNosepinChecked) {
-          this.isEarringChecked = false;
-          this.isNecklaceChecked = false;
-          this.isNethichuttiChecked = false;
-          this.isAllJewelChecked = false;
-        }
-        break;
-      case "All":
-        this.isAllJewelChecked = !this.isAllJewelChecked;
-        if (this.isAllJewelChecked) {
-          this.isEarringChecked = false;
-          this.isNecklaceChecked = false;
-          this.isNethichuttiChecked = false;
-          this.isNosepinChecked = false;
-        }
-        break;
+  toggleCheckBoxes(category: string) {
+    if (category == "All") {
+      this.jewelCategoryFormGroup.get('All').setValue(true);
+      this.jewelCategoryFormGroup.get('Earring').setValue(false);
+      this.jewelCategoryFormGroup.get('Necklace').setValue(false);
+      this.jewelCategoryFormGroup.get('Nethichutti').setValue(false);
+      this.jewelCategoryFormGroup.get('Nosepin').setValue(false);
+      this.selectedJewelCategories = [];
+    } else {
+      const previousValue: boolean = this.jewelCategoryFormGroup.get(category).value;
+      const currentValue: Boolean = !previousValue;
+      this.jewelCategoryFormGroup.get(category).setValue(currentValue);
+      this.addOrRemoveJewelCategory(category, currentValue);
+    }
+    this.showCollection();
+
+    let isAnyCheckboxSelected: Boolean = false;
+    Object.keys(this.jewelCategoryFormGroup.controls).forEach(key => {
+      isAnyCheckboxSelected = isAnyCheckboxSelected || this.jewelCategoryFormGroup.controls[key].value;
+    });
+
+    if(!isAnyCheckboxSelected){
+      this.jewelCategoryFormGroup.get('All').setValue(true);
+    }
+  }
+
+  addOrRemoveJewelCategory(category: string, currentValue: Boolean) {
+    if (currentValue) {
+      this.selectedJewelCategories.push(category);
+      this.jewelCategoryFormGroup.get('All').setValue(false);
+    } else {
+      const index = this.selectedJewelCategories.findIndex(x => x == category);
+      this.selectedJewelCategories.splice(index, 1);
     }
   }
 }

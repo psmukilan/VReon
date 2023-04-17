@@ -30,6 +30,9 @@ namespace jewelAR_API.Services
         public async Task<List<Jewel>> GetByCategoryAsync(string category) =>
             await _jewelsCollection.Find(x => x.Category == category).ToListAsync();
 
+        public async Task<List<Jewel>> GetByCategoriesAsync(string[] category) =>
+            await _jewelsCollection.Find(x => category.Any(y => y == x.Category)).ToListAsync();
+
         public async Task CreateAsync(Jewel newJewel) =>
             await _jewelsCollection.InsertOneAsync(newJewel);
 
