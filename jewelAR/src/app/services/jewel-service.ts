@@ -10,6 +10,7 @@ import { JewelInfo } from "../models/jewel-info";
 export class JewelService {
     private postJewelInfoUrl = 'https://localhost:7292/api/Jewels';
     private getAllJewelsUrl = 'https://localhost:7292/api/Jewels';
+    private getAllJewelsForJewllerIdUrl = 'https://localhost:7292/api/Jewels/GetAllJewelsForJewellerId';
     private getJewelsByCategoryUrl = 'https://localhost:7292/api/Jewels/GetJewelsByCategory/';
     private getJewelsByCategoriesUrl = 'https://localhost:7292/api/Jewels/GetJewelsByCategories/';
 
@@ -23,16 +24,32 @@ export class JewelService {
         return this.http.get<JewelInfo[]>(this.getAllJewelsUrl);
     }
 
+    GetAllJewelsForJewellerId(jewellerId: string): Observable<JewelInfo[]> {
+        return this.http.get<JewelInfo[]>(this.getAllJewelsForJewllerIdUrl, {
+            params: {
+                jewellerId: jewellerId
+            }
+        });
+    }
+
     GetJewel(jewelId: string | null): Observable<JewelInfo> {
         return this.http.get<JewelInfo>(this.getAllJewelsUrl + "/" + jewelId);
     }
 
-    GetJewelsByCategory(category: string): Observable<JewelInfo[]> {
-        return this.http.get<JewelInfo[]>(this.getJewelsByCategoryUrl + category);
+    GetJewelsByCategory(category: string, jewellerId: string): Observable<JewelInfo[]> {
+        return this.http.get<JewelInfo[]>(this.getJewelsByCategoryUrl + category, {
+            params: {
+                jewellerId: jewellerId
+            }
+        });
     }
 
-    GetJewelsByCategories(categories: string[]): Observable<JewelInfo[]> {
+    GetJewelsByCategories(categories: string[], jewellerId: string): Observable<JewelInfo[]> {
         const category = categories.join(',');
-        return this.http.get<JewelInfo[]>(this.getJewelsByCategoriesUrl + category);
+        return this.http.get<JewelInfo[]>(this.getJewelsByCategoriesUrl + category, {
+            params: {
+                jewellerId: jewellerId
+            }
+        });
     }
 }

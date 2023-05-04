@@ -59,8 +59,9 @@
             </ngb-carousel>
             <div class="card-body">
                 <h5 class="card-title">{{ selectedJewel[0].category }}</h5>
-                <p class="card-text">Some quick example text to build on the card title and make up the bulk of the
-                    card's content.</p>
+                <p class="card-text">Weight: {{selectedJewel[0].weight}}</p>
+                <p class="card-text">Purity: {{selectedJewel[0].purity}}</p>
+                <p class="card-text">Price: {{selectedJewel[0].price}}</p>
             </div>
         </div>
     </div>
@@ -171,6 +172,14 @@
         </button>
     </div>
 </div> -->
+
+<div *ngIf="isJeweller">
+    <div class="row">
+        <div style="float: right; padding: 10px;">
+            <button class="btn btn-secondary" (click)="openFileUploadModal()">Upload</button>
+        </div>
+    </div>
+</div>
 
 <!-- Image Upload Modal -->
 <ng-template #showImageUploadModal>

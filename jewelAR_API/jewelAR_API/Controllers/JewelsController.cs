@@ -18,6 +18,10 @@ namespace jewelAR_API.Controllers
         public async Task<List<Jewel>> Get() =>
             await _jewelsService.GetAsync();
 
+        [HttpGet("GetAllJewelsForJewellerId")]
+        public async Task<List<Jewel>> GetAllJewelsForJewellerId([FromQuery] string jewellerId) =>
+            await _jewelsService.GetAllJewelsForJewellerIdAsync(jewellerId);
+
         [HttpGet("{id:length(24)}")]
         public async Task<ActionResult<Jewel>> Get(string id)
         {
@@ -32,17 +36,17 @@ namespace jewelAR_API.Controllers
         }
 
         [HttpGet("GetJewelsByCategory/{category}")]
-        public async Task<ActionResult<List<Jewel>>> GetJewelsByCategory(string category)
+        public async Task<ActionResult<List<Jewel>>> GetJewelsByCategory(string category, [FromQuery] string jewellerId)
         {
-            var jewel = await _jewelsService.GetByCategoryAsync(category);
+            var jewel = await _jewelsService.GetByCategoryAsync(category, jewellerId);
             return jewel;
         }
 
         [HttpGet("GetJewelsByCategories/{category}")]
-        public async Task<ActionResult<List<Jewel>>> GetJewelsByCategories(string category)
+        public async Task<ActionResult<List<Jewel>>> GetJewelsByCategories(string category, [FromQuery] string jewellerId)
         {
             var categories = category.Split(',');
-            var jewel = await _jewelsService.GetByCategoriesAsync(categories);
+            var jewel = await _jewelsService.GetByCategoriesAsync(categories, jewellerId);
             return jewel;
         }
 

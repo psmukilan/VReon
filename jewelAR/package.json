@@ -26,6 +26,7 @@
     "@popperjs/core": "^2.11.6",
     "@rxweb/reactive-form-validators": "^13.0.0",
     "@tensorflow-models/facemesh": "^0.0.5",
+    "@tensorflow-models/handpose": "^0.0.7",
     "@tensorflow/tfjs": "^2.1.0",
     "bootstrap": "^5.2.3",
     "jquery": "^3.6.3",

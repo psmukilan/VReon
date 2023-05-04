@@ -1,6 +1,8 @@
 ﻿using jewelAR_API.Models;
 using jewelAR_API.Services;
 using Microsoft.AspNetCore.Mvc;
+using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 
 namespace jewelAR_API.Controllers
 {
@@ -68,6 +70,26 @@ namespace jewelAR_API.Controllers
             await _usersService.RemoveAsync(id);
 
             return NoContent();
+        }
+
+        [HttpPost("ValidateUser")]
+        public async Task<User?> ValidateUser([FromBody] UserCredentials userCredentials)
+        {
+            var user = await _usersService.ValidateUserAsync(userCredentials.Email, userCredentials.Password);
+            if(user != null)
+            {
+                return user;
+            }
+            else
+            {
+                return null;
+            }
+        }
+
+        [HttpGet("GetDefaultUser")]
+        public async Task<User> GetDefaultUser()
+        {
+            return await _usersService.GetDefaultUserAsync();
         }
     }
 }

@@ -27,6 +27,12 @@ namespace jewelAR_API.Services
         public async Task<User?> GetAsync(string id) =>
             await _usersCollection.Find(x => x.Id == id).FirstOrDefaultAsync();
 
+        public async Task<User?> ValidateUserAsync(string email, string password) =>
+            await _usersCollection.Find(x => x.Email == email && x.Password == password).FirstOrDefaultAsync();
+
+        public async Task<User> GetDefaultUserAsync() =>
+            await _usersCollection.Find(_ => true).FirstOrDefaultAsync();
+
         public async Task CreateAsync(User newUser) =>
             await _usersCollection.InsertOneAsync(newUser);
 

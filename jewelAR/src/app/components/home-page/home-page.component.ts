@@ -21,40 +21,5 @@ export class HomePageComponent implements OnInit {
     ) {}
 
   ngOnInit(): void {
-    this.loadAllJewels();
-  }
-
-  loadAllJewels() {
-    this.jewelService.GetAllJewels().subscribe((jewels) => {
-      this.jewelInfo = jewels;
-    });
-  }
-
-  openFileUploadModal() {
-    const modalOptions = {
-      backdrop: true,
-      ignoreBackdropClick: true,
-      keyboard: false,
-      animated: true,
-      class: 'modal-lg',
-    } as ModalOptions;
-
-    const initialState = {
-      title: 'Upload Jewel Information',
-    };
-
-    this.bsModalRef = this.bsModalService.show(UploadFileModalComponent, {
-      initialState,
-      class: 'modal-lg',
-    });
-  }
-
-  goToJewelPage(jewel: JewelInfo) {
-    const jewelId = jewel ? jewel.id : null;
-    this.router.navigate(['/jewel', { id: jewelId }]);
-  }
-
-  goToEarringCollection() {
-    this.router.navigate(['/jewel']);
   }
 }

@@ -1,5 +1,5 @@
 import { Component, Input, OnInit, SimpleChanges, TemplateRef, ViewChild } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { JewelInfo } from 'src/app/models/jewel-info';
 import { JewelService } from 'src/app/services/jewel-service';
 import * as facemesh from '@tensorflow-models/facemesh';
@@ -9,6 +9,8 @@ import { DetectJewel } from '../../../models/detectJewel';
 import { BsModalService, BsModalRef, ModalOptions } from 'ngx-bootstrap/modal';
 import { HttpClient } from '@angular/common/http';
 import { FormBuilder, FormControl, FormGroup } from '@angular/forms';
+import { LoginService } from 'src/app/services/login-service';
+import { UploadFileModalComponent } from '../modal/upload-file-modal.component';
 
 @Component({
   selector: 'app-video-ar-content',
@@ -18,7 +20,8 @@ import { FormBuilder, FormControl, FormGroup } from '@angular/forms';
 
 export class VideoArContentComponent implements OnInit {
   jewels!: JewelInfo[];
-  @Input() selectedJewel: JewelInfo[] = [];
+  selectedJewel: JewelInfo[] = [];
+  @Input() jewellerId: string;
   jewelsToDisplay!: JewelInfo[];
   jewelDisplayConstant = 10;
   currentStartPosition = 0;
@@ -56,6 +59,7 @@ export class VideoArContentComponent implements OnInit {
   displayImages: string[] = [];
   jewelCategoryFormGroup!: FormGroup;
   selectedJewelCategories: string[] = [];
+  isJeweller: Boolean = false;
 
   @ViewChild('showImageUploadModal', { read: TemplateRef }) showImageUploadModal !: TemplateRef<any>;
 
@@ -63,15 +67,16 @@ export class VideoArContentComponent implements OnInit {
     private route: ActivatedRoute,
     private jewelService: JewelService,
     private bsModalService: BsModalService,
-    private http: HttpClient,
-    private formBuilder: FormBuilder
+    private loginService: LoginService,
+    private formBuilder: FormBuilder,
+    private router: Router
   ) { }
 
   ngOnInit(): void {
     this.jewelCategoryFormGroup = this.initForm();
     this.initializeVideoARElements();
     this.initializeImageARElements();
-    this.getJewelInfo();
+    this.getJewellerIdFromUrl();
   }
 
   initializeImageARElements() {
@@ -96,9 +101,34 @@ export class VideoArContentComponent implements OnInit {
     });
   }
 
+  getJewellerIdFromUrl() {
+    let id=this.route.snapshot.paramMap.get("id");
+    if(id){
+      this.jewellerId = id;
+      let checkIfJeweller = sessionStorage.getItem("IsJeweller");
+      this.isJeweller = checkIfJeweller == "true" ? true : false;
+      this.getJewelInfo();
+    }
+    else{
+      this.getDefaultJeweller();
+    }
+  }
+
+  getDefaultJeweller() {
+    this.isLoading = true;
+    this.loginService.GetDefaultUser().subscribe((jeweller) => {
+      this.jewellerId = jeweller.id;
+      sessionStorage.setItem("LoggedInUserId", this.jewellerId);
+      sessionStorage.setItem("IsJeweller", String(jeweller.isJeweller));
+      this.isJeweller = jeweller.isJeweller;
+      this.router.navigate(['/home', { id: this.jewellerId }]);
+      this.getJewellerIdFromUrl();
+    });
+  }
+
   getJewelInfo() {
     this.isLoading = true;
-    this.jewelService.GetAllJewels().subscribe((jewel) => {
+    this.jewelService.GetAllJewelsForJewellerId(this.jewellerId).subscribe((jewel) => {
       this.jewels = jewel;
       this.isLoading = false;
       this.jewelsToDisplay = this.jewels.length > this.jewelDisplayConstant ? this.jewels.slice(this.currentStartPosition, this.jewelDisplayConstant) : this.jewels;
@@ -129,7 +159,7 @@ export class VideoArContentComponent implements OnInit {
       });
   }
 
-  async detectLandmarks(inputVideo: HTMLVideoElement, inputCanvasContext: CanvasRenderingContext2D, jewelArray: JewelInfo[] = this.selectedJewel) {
+  async detectLandmarks(inputVideo: HTMLVideoElement, inputCanvasContext: CanvasRenderingContext2D) {
     this.isLoading = true;
     this.canvas.hidden = false;
 
@@ -162,7 +192,7 @@ export class VideoArContentComponent implements OnInit {
                   if (referenceXKeyPoint < (this.previousXKeyPoint - 10) || referenceXKeyPoint > (this.previousXKeyPoint + 10)) {
 
                   }
-                  jewelArray.forEach((jewel) => {
+                  this.selectedJewel.forEach((jewel) => {
                     this.drawJewelOnCanvas(jewel, inputCanvasContext, keypoints, width, height);
                   })
 
@@ -242,8 +272,19 @@ export class VideoArContentComponent implements OnInit {
         const currentEarringImage = jewel.image;
         earringImage.src = "data:image/png;base64," + currentEarringImage;
         earringImage.onload = (e) => {
-          ctx.drawImage(earringImage, Math.abs(earring_x1 - eyeDistanceForEarring / 2 - 10), earring_y1, eyeDistanceForEarring, eyeDistanceForEarring);
-          ctx.drawImage(earringImage, Math.abs(earring_x2 - eyeDistanceForEarring / 2 + 10), earring_y2, eyeDistanceForEarring, eyeDistanceForEarring);
+          let eardepth1 = Math.abs(earring_z1);
+          let eardepth2 = Math.abs(earring_z2);
+          if ((Math.abs(eardepth1 - eardepth2) > 40)) {
+            if (eardepth1 < eardepth2) {
+              ctx.drawImage(earringImage, Math.abs(earring_x1 - eyeDistanceForEarring / 2 - 10), earring_y1, eyeDistanceForEarring, eyeDistanceForEarring);
+            }
+            if (eardepth2 < eardepth1) {
+              ctx.drawImage(earringImage, Math.abs(earring_x2 - eyeDistanceForEarring / 2 + 10), earring_y2, eyeDistanceForEarring, eyeDistanceForEarring);
+            }
+          } else {
+            ctx.drawImage(earringImage, Math.abs(earring_x1 - eyeDistanceForEarring / 2 - 10), earring_y1, eyeDistanceForEarring, eyeDistanceForEarring);
+            ctx.drawImage(earringImage, Math.abs(earring_x2 - eyeDistanceForEarring / 2 + 10), earring_y2, eyeDistanceForEarring, eyeDistanceForEarring);
+          }
         }
         break;
 
@@ -524,20 +565,16 @@ export class VideoArContentComponent implements OnInit {
 
   showCollection() {
     if (this.selectedJewelCategories.length == 0) {
-      this.jewelService.GetAllJewels().subscribe((jewel) => {
+      this.jewelService.GetAllJewelsForJewellerId(this.jewellerId).subscribe((jewel) => {
         this.jewels = jewel;
         this.jewelsToDisplay = this.jewels.length > this.jewelDisplayConstant ? this.jewels.slice(0, this.jewelDisplayConstant) : this.jewels;
-        this.selectedJewel = [];
-        this.selectedJewel.push(this.jewels[0]);
         this.detectLandmarksOnImage();
       });
     }
     else {
-      this.jewelService.GetJewelsByCategories(this.selectedJewelCategories).subscribe((jewel) => {
+      this.jewelService.GetJewelsByCategories(this.selectedJewelCategories, this.jewellerId).subscribe((jewel) => {
         this.jewels = jewel;
         this.jewelsToDisplay = this.jewels.length > this.jewelDisplayConstant ? this.jewels.slice(0, this.jewelDisplayConstant) : this.jewels;
-        this.selectedJewel = [];
-        this.selectedJewel.push(this.jewels[0]);
         this.detectLandmarksOnImage();
       });
     }
@@ -564,7 +601,7 @@ export class VideoArContentComponent implements OnInit {
       isAnyCheckboxSelected = isAnyCheckboxSelected || this.jewelCategoryFormGroup.controls[key].value;
     });
 
-    if(!isAnyCheckboxSelected){
+    if (!isAnyCheckboxSelected) {
       this.jewelCategoryFormGroup.get('All').setValue(true);
     }
   }
@@ -577,5 +614,25 @@ export class VideoArContentComponent implements OnInit {
       const index = this.selectedJewelCategories.findIndex(x => x == category);
       this.selectedJewelCategories.splice(index, 1);
     }
+  }
+
+  
+  openFileUploadModal() {
+    const modalOptions = {
+      backdrop: true,
+      ignoreBackdropClick: true,
+      keyboard: false,
+      animated: true,
+      class: 'modal-lg',
+    } as ModalOptions;
+
+    const initialState = {
+      title: 'Upload Jewel Information',
+    };
+
+    this.bsModalRef = this.bsModalService.show(UploadFileModalComponent, {
+      initialState,
+      class: 'modal-lg',
+    });
   }
 }
