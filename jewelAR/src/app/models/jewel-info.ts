@@ -7,4 +7,5 @@ export class JewelInfo{
     price!: number;
     image!: string;
     displayImages!: string[];
+    isSelected: Boolean = false;
 }

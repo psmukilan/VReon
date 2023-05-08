@@ -11,6 +11,7 @@ import { HttpClient } from '@angular/common/http';
 import { FormBuilder, FormControl, FormGroup } from '@angular/forms';
 import { LoginService } from 'src/app/services/login-service';
 import { UploadFileModalComponent } from '../modal/upload-file-modal.component';
+import * as mpHands from '@tensorflow-models/handpose';
 
 @Component({
   selector: 'app-video-ar-content',
@@ -60,6 +61,7 @@ export class VideoArContentComponent implements OnInit {
   jewelCategoryFormGroup!: FormGroup;
   selectedJewelCategories: string[] = [];
   isJeweller: Boolean = false;
+  pageNumber: number = 1;
 
   @ViewChild('showImageUploadModal', { read: TemplateRef }) showImageUploadModal !: TemplateRef<any>;
 
@@ -102,14 +104,14 @@ export class VideoArContentComponent implements OnInit {
   }
 
   getJewellerIdFromUrl() {
-    let id=this.route.snapshot.paramMap.get("id");
-    if(id){
+    let id = this.route.snapshot.paramMap.get("id");
+    if (id) {
       this.jewellerId = id;
       let checkIfJeweller = sessionStorage.getItem("IsJeweller");
       this.isJeweller = checkIfJeweller == "true" ? true : false;
       this.getJewelInfo();
     }
-    else{
+    else {
       this.getDefaultJeweller();
     }
   }
@@ -128,11 +130,12 @@ export class VideoArContentComponent implements OnInit {
 
   getJewelInfo() {
     this.isLoading = true;
-    this.jewelService.GetAllJewelsForJewellerId(this.jewellerId).subscribe((jewel) => {
+    this.jewelService.GetAllJewelsForJewellerIdWithPagination(this.jewellerId, this.pageNumber).subscribe((jewel) => {
       this.jewels = jewel;
       this.isLoading = false;
       this.jewelsToDisplay = this.jewels.length > this.jewelDisplayConstant ? this.jewels.slice(this.currentStartPosition, this.jewelDisplayConstant) : this.jewels;
       this.selectedJewel.push(this.jewels[0]);
+      this.jewelsToDisplay[0].isSelected = true;
       this.detectLandmarksOnImage();
     });
   }
@@ -165,6 +168,7 @@ export class VideoArContentComponent implements OnInit {
 
     // Load the Facemesh model
     const model = await facemesh.load();
+    //const handpose = await mpHands.load();
 
     navigator.mediaDevices
       .getUserMedia({ video: true })
@@ -178,27 +182,27 @@ export class VideoArContentComponent implements OnInit {
           this.intervalId = setInterval(async () => {
             if (this.detectJewelOnMainCanvas) {
               const predictions = await model.estimateFaces(inputVideo);
+              // const handpredictions = await handpose.estimateHands(inputVideo);
               if (predictions && predictions.length) {
                 // Draw the facial landmarks on the canvas
-                for (let i = 0; i < predictions.length; i++) {
-                  const keypoints = predictions[i].scaledMesh as any[];
-                  let width = inputVideo.width;
-                  let height = inputVideo.height;
-                  inputCanvasContext.drawImage(this.video, 0, 0, width, height);
-                  this.isLoading = false;
+                const keypoints = predictions[0].scaledMesh as any[];
+                //const handKeyPoints = handpredictions[0].landmarks as any[];
+                let width = inputVideo.width;
+                let height = inputVideo.height;
+                inputCanvasContext.drawImage(this.video, 0, 0, width, height);
+                this.isLoading = false;
 
-                  const referenceXKeyPoint = keypoints[168][0];
-                  const referenceYKeyPoint = keypoints[168][1];
-                  if (referenceXKeyPoint < (this.previousXKeyPoint - 10) || referenceXKeyPoint > (this.previousXKeyPoint + 10)) {
+                const referenceXKeyPoint = keypoints[168][0];
+                const referenceYKeyPoint = keypoints[168][1];
+                if (referenceXKeyPoint < (this.previousXKeyPoint - 10) || referenceXKeyPoint > (this.previousXKeyPoint + 10)) {
 
-                  }
-                  this.selectedJewel.forEach((jewel) => {
-                    this.drawJewelOnCanvas(jewel, inputCanvasContext, keypoints, width, height);
-                  })
-
-                  this.previousXKeyPoint = referenceXKeyPoint;
-                  this.previousYKeyPoint = referenceYKeyPoint;
                 }
+                this.selectedJewel.forEach((jewel) => {
+                  this.drawJewelOnCanvas(jewel, inputCanvasContext, keypoints, width, height);
+                })
+
+                this.previousXKeyPoint = referenceXKeyPoint;
+                this.previousYKeyPoint = referenceYKeyPoint;
               }
               else {
                 inputCanvasContext.clearRect(0, 0, this.canvas.width, this.canvas.height);
@@ -210,56 +214,6 @@ export class VideoArContentComponent implements OnInit {
           }, 200);
         }
       });
-  }
-
-  drawJewelOnImageCanvas(jewel: JewelInfo, ctx: CanvasRenderingContext2D, keypoints: any[], width: number, height: number) {
-    switch (jewel.category) {
-      case "Earring":
-        const [earring_x1, earring_y1, earring_z1] = keypoints[93];
-        const [earring_x2, earring_y2, earring_z2] = keypoints[323];
-        const eyeDistanceForEarring = this.CalculateEyeDistance(keypoints[282], keypoints[52], width, height);
-        const earringImage = new Image();
-        const currentEarringImage = jewel.image;
-        earringImage.src = "data:image/png;base64," + currentEarringImage;
-        earringImage.onload = (e) => {
-          ctx.drawImage(earringImage, Math.abs(earring_x1 - eyeDistanceForEarring / 2 - 10), earring_y1, eyeDistanceForEarring, eyeDistanceForEarring);
-          ctx.drawImage(earringImage, Math.abs(earring_x2 - eyeDistanceForEarring / 2 + 10), earring_y2, eyeDistanceForEarring, eyeDistanceForEarring);
-        }
-        break;
-
-      case "Necklace":
-        const [necklace_x, necklace_y, necklace_z] = keypoints[136];
-        const eyeDistanceForNecklace = this.CalculateEyeDistance(keypoints[282], keypoints[52], width, height);
-        const necklaceImage = new Image();
-        const currentNecklaceImage = jewel.image;
-        necklaceImage.src = "data:image/png;base64," + currentNecklaceImage;
-        necklaceImage.onload = (e) => {
-          ctx.drawImage(necklaceImage, necklace_x - (eyeDistanceForNecklace * 1.8), necklace_y, eyeDistanceForNecklace * 5, eyeDistanceForNecklace * 5);
-        }
-        break;
-
-      case "Nosepin":
-        const [nosePin_x, nosePin_y, nosePin_z] = keypoints[457];
-        const eyeDistanceForNosePin = this.CalculateEyeDistance(keypoints[282], keypoints[52], width, height);
-        const nosePinImage = new Image();
-        const currentNosePinImage = jewel.image;
-        nosePinImage.src = "data:image/png;base64," + currentNosePinImage;
-        nosePinImage.onload = (e) => {
-          ctx.drawImage(nosePinImage, Math.abs(nosePin_x - eyeDistanceForNosePin), Math.abs(nosePin_y - (eyeDistanceForNosePin * 0.9)), eyeDistanceForNosePin * 1.8, eyeDistanceForNosePin * 1.8);
-        }
-        break;
-
-      case "Nethichutti":
-        const [nethichutti_x, nethichutti_y, nethichutti_z] = keypoints[10];
-        const eyeDistanceForNethichutti = this.CalculateEyeDistance(keypoints[282], keypoints[52], width, height);
-        const nethichuttiImage = new Image();
-        const currentNethichuttiImage = jewel.image;
-        nethichuttiImage.src = "data:image/png;base64," + currentNethichuttiImage;
-        nethichuttiImage.onload = (e) => {
-          ctx.drawImage(nethichuttiImage, Math.abs(nethichutti_x - (eyeDistanceForNethichutti)), Math.abs(nethichutti_y - (eyeDistanceForNethichutti)), eyeDistanceForNethichutti * 2, eyeDistanceForNethichutti * 2);
-        }
-        break;
-    }
   }
 
   drawJewelOnCanvas(jewel: JewelInfo, ctx: CanvasRenderingContext2D, keypoints: any[], width: number, height: number) {
@@ -320,6 +274,30 @@ export class VideoArContentComponent implements OnInit {
           ctx.drawImage(nethichuttiImage, Math.abs(nethichutti_x - (eyeDistanceForNethichutti)), Math.abs(nethichutti_y - (eyeDistanceForNethichutti)), eyeDistanceForNethichutti * 2, eyeDistanceForNethichutti * 2);
         }
         break;
+
+      // case "Ring":
+      //   const [ring_x, ring_y, ring_z] = handKeyPoints[14];
+      //   const eyeDistanceForRing = this.CalculateEyeDistance(handKeyPoints[5], handKeyPoints[17], width, height);
+      //   const RingImage = new Image();
+      //   const currentRingImage = jewel.image;
+      //   RingImage.src = "data:image/png;base64," + currentRingImage;
+      //   RingImage.onload = (e) => {
+      //     ctx.drawImage(RingImage, ring_x - 50, ring_y, eyeDistanceForRing, eyeDistanceForRing);
+
+      //   }
+      //   break;
+
+      // case "Watch":
+      //   const [watch_x, watch_y, watch_z] = handKeyPoints[0];
+      //   const eyeDistanceForWatch = this.CalculateEyeDistance(handKeyPoints[5], handKeyPoints[17], width, height);
+      //   const watchImage = new Image();
+      //   const currentWatchImage = jewel.image;
+      //   watchImage.src = "data:image/png;base64," + currentWatchImage;
+      //   watchImage.onload = (e) => {
+      //     ctx.drawImage(watchImage, watch_x / 2, watch_y, eyeDistanceForWatch * 5, eyeDistanceForWatch * 5);
+
+      //   }
+      //   break;
     }
   }
 
@@ -341,17 +319,30 @@ export class VideoArContentComponent implements OnInit {
     if (jewelIndex >= 0) {
       let isSameJewel = this.selectedJewel.findIndex(x => x.id == jewel.id);
       if (isSameJewel >= 0) {
+        //unselecting already selected jewel
+        const alreadySelectedJewel = this.jewelsToDisplay.find(x => x.id == jewel.id);
+        if (alreadySelectedJewel) {
+          alreadySelectedJewel.isSelected = false;
+        }
         this.selectedJewel.splice(isSameJewel, 1);
+        this.detectLandmarksOnImage();
       }
       else {
+        //removing previous jewel of same category and adding new jewel
         this.selectedJewel.splice(jewelIndex, 1);
+        const alreadySelectedJewel = this.jewelsToDisplay.find(x => x.category == jewel.category && x.isSelected);
+        if (alreadySelectedJewel) {
+          alreadySelectedJewel.isSelected = false;
+        }
         this.selectedJewel.push(jewel);
+        jewel.isSelected = true;
         this.displayImages = jewel.displayImages;
         this.detectLandmarksOnImage();
       }
     }
     else {
       this.selectedJewel.push(jewel);
+      jewel.isSelected = true;
       this.displayImages = jewel.displayImages;
       this.detectLandmarksOnImage();
     }
@@ -385,9 +376,13 @@ export class VideoArContentComponent implements OnInit {
     const model = await facemesh.load();
     const predictions = await model.estimateFaces(this.image);
 
+    //Load the hand predictions model
+    // const handModel = await mpHands.load();
+    // const handPredictions = await handModel.estimateHands(this.image);
+
     // Draw the facial landmarks on the canvas
-    for (let i = 0; i < predictions.length; i++) {
-      const keypoints = predictions[i].scaledMesh as any[];
+    const keypoints = predictions[0].scaledMesh as any[];
+    //const handKeyPoints = handPredictions[0].landmarks as any[];
       let width = this.image.width;
       let height = this.image.height;
       if (this.selectedJewel && this.selectedJewel.length) {
@@ -395,7 +390,6 @@ export class VideoArContentComponent implements OnInit {
           this.drawJewelOnCanvas(jewel, this.imageCanvasContext, keypoints, width, height);
         })
       }
-    }
   }
 
   captureImage() {
@@ -565,14 +559,16 @@ export class VideoArContentComponent implements OnInit {
 
   showCollection() {
     if (this.selectedJewelCategories.length == 0) {
-      this.jewelService.GetAllJewelsForJewellerId(this.jewellerId).subscribe((jewel) => {
+      this.pageNumber = 1;
+      this.jewelService.GetAllJewelsForJewellerIdWithPagination(this.jewellerId, this.pageNumber).subscribe((jewel) => {
         this.jewels = jewel;
         this.jewelsToDisplay = this.jewels.length > this.jewelDisplayConstant ? this.jewels.slice(0, this.jewelDisplayConstant) : this.jewels;
         this.detectLandmarksOnImage();
       });
     }
     else {
-      this.jewelService.GetJewelsByCategories(this.selectedJewelCategories, this.jewellerId).subscribe((jewel) => {
+      this.pageNumber = 1;
+      this.jewelService.GetJewelsByCategories(this.selectedJewelCategories, this.jewellerId, this.pageNumber).subscribe((jewel) => {
         this.jewels = jewel;
         this.jewelsToDisplay = this.jewels.length > this.jewelDisplayConstant ? this.jewels.slice(0, this.jewelDisplayConstant) : this.jewels;
         this.detectLandmarksOnImage();
@@ -616,7 +612,7 @@ export class VideoArContentComponent implements OnInit {
     }
   }
 
-  
+
   openFileUploadModal() {
     const modalOptions = {
       backdrop: true,
@@ -634,5 +630,59 @@ export class VideoArContentComponent implements OnInit {
       initialState,
       class: 'modal-lg',
     });
+  }
+
+  nextPage() {
+    if (this.selectedJewelCategories.length > 0) {
+      this.jewelService.GetJewelsByCategories(this.selectedJewelCategories, this.jewellerId, this.pageNumber + 1).subscribe((jewel) => {
+        if (jewel && jewel.length) {
+          this.jewels = jewel;
+          this.jewelsToDisplay = this.jewels.length > this.jewelDisplayConstant ? this.jewels.slice(0, this.jewelDisplayConstant) : this.jewels;
+          const selectedJewelIds = this.selectedJewel.map(x => x.id);
+          this.jewelsToDisplay.filter(x => selectedJewelIds.includes(x.id)).forEach(x => x.isSelected = true);
+          this.pageNumber++;
+          this.detectLandmarksOnImage();
+        }
+      });
+    } else {
+      this.jewelService.GetAllJewelsForJewellerIdWithPagination(this.jewellerId, this.pageNumber + 1).subscribe((jewel) => {
+        if (jewel && jewel.length) {
+          this.jewels = jewel;
+          this.jewelsToDisplay = this.jewels.length > this.jewelDisplayConstant ? this.jewels.slice(0, this.jewelDisplayConstant) : this.jewels;
+          const selectedJewelIds = this.selectedJewel.map(x => x.id);
+          this.jewelsToDisplay.filter(x => selectedJewelIds.includes(x.id)).forEach(x => x.isSelected = true);
+          this.pageNumber++;
+          this.detectLandmarksOnImage();
+        }
+      });
+    }
+  }
+
+  previousPage() {
+    if (this.pageNumber > 1) {
+      if (this.selectedJewelCategories.length > 0) {
+        this.jewelService.GetJewelsByCategories(this.selectedJewelCategories, this.jewellerId, this.pageNumber - 1).subscribe((jewel) => {
+          if (jewel && jewel.length) {
+            this.jewels = jewel;
+            this.jewelsToDisplay = this.jewels.length > this.jewelDisplayConstant ? this.jewels.slice(0, this.jewelDisplayConstant) : this.jewels;
+            const selectedJewelIds = this.selectedJewel.map(x => x.id);
+            this.jewelsToDisplay.filter(x => selectedJewelIds.includes(x.id)).forEach(x => x.isSelected = true);
+            this.pageNumber--;
+            this.detectLandmarksOnImage();
+          }
+        });
+      } else {
+        this.jewelService.GetAllJewelsForJewellerIdWithPagination(this.jewellerId, this.pageNumber - 1).subscribe((jewel) => {
+          if (jewel && jewel.length) {
+            this.jewels = jewel;
+            this.jewelsToDisplay = this.jewels.length > this.jewelDisplayConstant ? this.jewels.slice(0, this.jewelDisplayConstant) : this.jewels;
+            const selectedJewelIds = this.selectedJewel.map(x => x.id);
+            this.jewelsToDisplay.filter(x => selectedJewelIds.includes(x.id)).forEach(x => x.isSelected = true);
+            this.pageNumber--;
+            this.detectLandmarksOnImage();
+          }
+        });
+      }
+    }
   }
 }

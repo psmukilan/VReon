@@ -11,8 +11,10 @@ export class JewelService {
     private postJewelInfoUrl = 'https://localhost:7292/api/Jewels';
     private getAllJewelsUrl = 'https://localhost:7292/api/Jewels';
     private getAllJewelsForJewllerIdUrl = 'https://localhost:7292/api/Jewels/GetAllJewelsForJewellerId';
+    private getAllJewelsForJewellerIdWithPaginationUrl = 'https://localhost:7292/api/Jewels/GetAllJewelsForJewellerIdWithPagination';
     private getJewelsByCategoryUrl = 'https://localhost:7292/api/Jewels/GetJewelsByCategory/';
     private getJewelsByCategoriesUrl = 'https://localhost:7292/api/Jewels/GetJewelsByCategories/';
+    private getJewelsByCategoriesWithPaginationUrl = 'https://localhost:7292/api/Jewels/GetJewelsByCategoriesWithPagination/';
 
     constructor(private http: HttpClient) {}
 
@@ -32,6 +34,15 @@ export class JewelService {
         });
     }
 
+    GetAllJewelsForJewellerIdWithPagination(jewellerId: string, pageNumber: number): Observable<JewelInfo[]> {
+        return this.http.get<JewelInfo[]>(this.getAllJewelsForJewellerIdWithPaginationUrl, {
+            params: {
+                jewellerId: jewellerId,
+                pageNumber: pageNumber
+            }
+        });
+    }
+
     GetJewel(jewelId: string | null): Observable<JewelInfo> {
         return this.http.get<JewelInfo>(this.getAllJewelsUrl + "/" + jewelId);
     }
@@ -44,11 +55,12 @@ export class JewelService {
         });
     }
 
-    GetJewelsByCategories(categories: string[], jewellerId: string): Observable<JewelInfo[]> {
+    GetJewelsByCategories(categories: string[], jewellerId: string, pageNumber: number): Observable<JewelInfo[]> {
         const category = categories.join(',');
-        return this.http.get<JewelInfo[]>(this.getJewelsByCategoriesUrl + category, {
+        return this.http.get<JewelInfo[]>(this.getJewelsByCategoriesWithPaginationUrl + category, {
             params: {
-                jewellerId: jewellerId
+                jewellerId: jewellerId,
+                pageNumber: pageNumber
             }
         });
     }

@@ -1,6 +1,7 @@
 ﻿using jewelAR_API.Models;
 using Microsoft.Extensions.Options;
 using MongoDB.Driver;
+using System.Linq;
 
 namespace jewelAR_API.Services
 {
@@ -27,14 +28,23 @@ namespace jewelAR_API.Services
         public async Task<List<Jewel>> GetAllJewelsForJewellerIdAsync(string jewellerId) =>
             await _jewelsCollection.Find(x => x.JewellerId == jewellerId).ToListAsync();
 
+        public async Task<List<Jewel>> GetAllJewelsForJewellerIdWithPaginationAsync(string jewellerId, int pageNumber) =>
+            await _jewelsCollection.Find(x => x.JewellerId == jewellerId).Skip((pageNumber-1) * 10).Limit(pageNumber * 10).ToListAsync();
+
         public async Task<Jewel?> GetAsync(string id) =>
             await _jewelsCollection.Find(x => x.Id == id).FirstOrDefaultAsync();
 
         public async Task<List<Jewel>> GetByCategoryAsync(string category, string jewellerId) =>
             await _jewelsCollection.Find(x => x.Category == category && x.JewellerId == jewellerId).ToListAsync();
 
+        public async Task<List<Jewel>> GetByCategoryWithPaginationAsync(string category, string jewellerId, int pageNumber) =>
+            await _jewelsCollection.Find(x => x.Category == category && x.JewellerId == jewellerId).Skip((pageNumber - 1) * 10).Limit(pageNumber * 10).ToListAsync();
+
         public async Task<List<Jewel>> GetByCategoriesAsync(string[] category, string jewellerId) =>
             await _jewelsCollection.Find(x => category.Any(y => y == x.Category) && x.JewellerId == jewellerId).ToListAsync();
+
+        public async Task<List<Jewel>> GetByCategoriesWithPaginationAsync(string[] category, string jewellerId, int pageNumber) =>
+            await _jewelsCollection.Find(x => category.Any(y => y == x.Category) && x.JewellerId == jewellerId).Skip((pageNumber - 1) * 10).Limit(pageNumber * 10).ToListAsync();
 
         public async Task CreateAsync(Jewel newJewel) =>
             await _jewelsCollection.InsertOneAsync(newJewel);
