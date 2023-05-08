@@ -7,3 +7,14 @@
     color: #f2dc6b; 
     font-family:'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
 }
+
+.heading {
+    font-family: 'Gloock', sans-serif;
+    font-size: 30px;
+    letter-spacing: 1rem;
+}
+
+.new-font {
+    font-family: 'Roboto', sans-serif;
+    letter-spacing: 0.5rem;
+}

@@ -27,3 +27,8 @@
     display: flex;
     justify-content: center;
 }
+
+.new-font {
+    font-family: 'Amiko', sans-serif;
+    font-size: small;
+}

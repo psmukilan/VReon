@@ -382,7 +382,7 @@ export class VideoArContentComponent implements OnInit {
 
     // Draw the facial landmarks on the canvas
     const keypoints = predictions[0].scaledMesh as any[];
-    //const handKeyPoints = handPredictions[0].landmarks as any[];
+    //const handKeyPoints = handPredictions && handPredictions.Length ? handPredictions[0].landmarks as any[] : [];
       let width = this.image.width;
       let height = this.image.height;
       if (this.selectedJewel && this.selectedJewel.length) {
