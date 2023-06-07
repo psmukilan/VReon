@@ -1,16 +1,39 @@
 <nav class="navbar navbar-dark bg-dark">
     <a class="navbar-brand heading" href="#">
-        <img style="margin-left: 5px;" src="../../../assets/logo.png" width="50" height="50" class="d-inline-block align-top" alt="">
-        JEWELAR
+        <img *ngIf="isJewellerLogoAvailable" style="margin-left: 5px;" src="data:image/png;base64,{{ jewellerLogo }}" width="50" height="50" class="d-inline-block align-top"
+            alt="">
+        <img *ngIf="!isJewellerLogoAvailable" style="margin-left: 5px; text-transform: uppercase;" src="../../../assets/logo.png" width="50" height="50" class="d-inline-block align-top"
+            alt="">
+        {{ jewellerName }}
     </a>
-    <div class="navbar-nav nav-bar-style">
-        <a class="nav-item nav-link nav-bar-style new-font" routerLink="/login">LOGIN</a>
+    <div>
+        <button style="margin: 5px;" class="btn btn-outline-secondary" (click)="openCartPage()"><i
+                class="fa-solid fa-cart-shopping"></i></button>
+        <button style="margin: 5px" class="btn btn-outline-secondary" (click)="openNav()"><i
+                class="fa-solid fa-bars"></i></button>
     </div>
 </nav>
-<!-- <div style="background-color: black;">
-    <img src="../../../assets/jewelar-gold.jpg" style="width: 100%;">
-</div> -->
-<div style="background-image: url('../../../assets/video-bg.jpg'); background-size: 100%;">
-    <app-video-ar-content></app-video-ar-content>
+<div [style.width]="isSideNavOpen ? '250px' : '0px'" id="mySidenav" class="sidenav">
+    <a href="javascript:void(0)" class="closebtn" (click)="closeNav()">&times;</a>
+    <a *ngIf="isJeweller" (click)="openFileUploadModal()">Upload</a>
+    <a class="signOut" routerLink="/login">Sign Out</a>
 </div>
-<!-- <app-video-ar-content></app-video-ar-content> -->
+<div style="background-color: black;">
+    <div style="width: 100%;"></div>
+</div>
+<div *ngIf="showJewels"
+    style="background-image: url('../../../assets/video-bg.jpg'); background-size: 100%; height: 100vh;">
+    <app-video-ar-content [jewelsAlreadyInCart]="jewelsInCart" (updateJewelsInCart)="updateJewelsInCart($event)"></app-video-ar-content>
+    <div style="display: flex; justify-content: center; margin-bottom: 10px;">
+        <footer class="footer mt-auto py-3 bg-body-tertiary">
+            <div class="container">
+                <a href="http://www.vreontech.com/" style="text-decoration: none; color: black;"
+                    class="text-body-secondary"><img src="../../../assets/Vreon_logo.png" style="height: 25px;">POWERED
+                    BY VREON</a>
+            </div>
+        </footer>
+    </div>
+</div>
+<div *ngIf="showCart">
+    <app-cart-page (continueShopping)="continueShopping($event)" [cartItems]="jewelsInCart"></app-cart-page>
+</div>

@@ -1,169 +1,182 @@
-<div class="row">
-    <!-- Model Image -->
-    <div class="col-3">
-        <ng-container>
-            <img id="image" src="../../../../assets/model-image-removebg.png">
-        </ng-container>
-        <canvas style="float: right;" class="add-padding" id="imageCanvas" width="269" height="480"></canvas>
-    </div>
-
-    <!-- Live AR Video -->
-    <div class="col-6">
-        <!-- Image to enable video -->
-        <div class="center" *ngIf="!showVideo">
-            <button class="btn add-padding" (click)="enableVideo()">
-                <img src="../../../../assets/try-on.png" width="auto" height="auto">
-            </button>
+<div *ngIf="!isJewelsAvailable">No Jewels Added Yet. Please upload jewels.</div>
+<ng-container *ngIf="isJewelsAvailable">
+    <div *ngIf="isJewelsAvailable" class="row">
+        <!-- Model Image -->
+        <div class="col-3">
+            <ng-container>
+                <img id="image" src="../../../../assets/model-image-removebg.png">
+            </ng-container>
+            <canvas style="float: right;" class="add-padding" id="imageCanvas" width="269" height="480"></canvas>
         </div>
-        <!-- Live Video Canvas -->
-        <div class="center">
-            <div *ngIf="isLoading" class="spinner-border text-secondary" role="status">
-                <span class="sr-only"></span>
+
+        <!-- Live AR Video -->
+        <div class="col-6">
+            <!-- Image to enable video -->
+            <div class="center" *ngIf="!showVideo">
+                <button class="btn" (click)="enableVideo()">
+                    <img src="../../../../assets/try-on.png" width="auto" height="auto">
+                </button>
             </div>
-            <video id="video" hidden="hidden" width="640" height="480"></video>
-            <canvas class="add-padding" id="canvas" hidden="hideCanvas" width="640" height="480"></canvas>
+            <!-- Live Video Canvas -->
+            <div class="center">
+                <div *ngIf="isLoading" class="spinner-border text-secondary" role="status">
+                    <span class="sr-only"></span>
+                </div>
+                <video id="video" hidden="hidden" width="640" height="480"></video>
+                <canvas class="add-padding" id="canvas" hidden="hideCanvas" width="640" height="480"></canvas>
+            </div>
+            <!-- Utility buttons for Video -->
+            <div class="center">
+                <button *ngIf="showVideo && !isLoading" class="btn btn-dark new-font"
+                    style="margin-left: 2%; margin-bottom: 2%;" (click)="captureImage()">
+                    <i class="fas fa-camera"></i> CAPTURE
+                </button>
+                <button *ngIf="showVideo && !isLoading" class="btn btn-dark new-font"
+                    style="margin-left: 2%; margin-bottom: 2%;" (click)="enableFullScreenMode()">
+                    <i class="fa-solid fa-maximize"></i> FULLSCREEN
+                </button>
+                <button *ngIf="showVideo && !isLoading" class="btn btn-dark new-font"
+                    style="margin-left: 2%; margin-bottom: 2%;" (click)="enableCompareMode()">
+                    <i class="fa-solid fa-arrow-right-arrow-left"></i> COMPARE
+                </button>
+                <button *ngIf="showVideo && !isLoading && capturedImages && capturedImages.length"
+                    class="btn btn-dark new-font" style="margin-left: 2%; margin-bottom: 2%;"
+                    (click)="viewCapturedPictures()">
+                    <i class="fa-solid fa-image"></i> VIEW IMAGES
+                </button>
+                <button *ngIf="showVideo && !isLoading" class="btn btn-dark new-font"
+                    style="margin-left: 2%; margin-bottom: 2%;" (click)="disableVideoStream()">
+                    <i class="fa-solid fa-image"></i> DISABLE VIDEO
+                </button>
+            </div>
         </div>
-        <!-- Utility buttons for Video -->
-        <div class="center">
-            <button *ngIf="showVideo && !isLoading" class="btn btn-dark new-font" style="margin-left: 2%; margin-bottom: 2%;"
-                (click)="captureImage()">
-                <i class="fas fa-camera"></i> CAPTURE
-            </button>
-            <button *ngIf="showVideo && !isLoading" class="btn btn-dark new-font" style="margin-left: 2%; margin-bottom: 2%;"
-                (click)="enableFullScreenMode()">
-                <i class="fa-solid fa-maximize"></i> FULLSCREEN
-            </button>
-            <button *ngIf="showVideo && !isLoading" class="btn btn-dark new-font" style="margin-left: 2%; margin-bottom: 2%;"
-                (click)="enableCompareMode()">
-                <i class="fa-solid fa-arrow-right-arrow-left"></i> COMPARE
-            </button>
-            <button *ngIf="showVideo && !isLoading && capturedImages && capturedImages.length" class="btn btn-dark new-font"
-                style="margin-left: 2%; margin-bottom: 2%;" (click)="viewCapturedPictures()">
-                <i class="fa-solid fa-image"></i> VIEW IMAGES
-            </button>
-            <button *ngIf="showVideo && !isLoading" class="btn btn-dark new-font" style="margin-left: 2%; margin-bottom: 2%;"
-                (click)="disableVideoStream()">
-                <i class="fa-solid fa-image"></i> DISABLE VIDEO
-            </button>
-        </div>
-    </div>
 
-    <!-- Image Carousel -->
-    <div class="col-3">
-        <div class="card bg-dark text-white add-padding" style="width: 18rem;">      
-            <ngb-carousel *ngIf="displayImages && displayImages.length">
-                <ng-template ngbSlide *ngFor="let image of displayImages">
-                    <div class="wrapper card-img-top" style="width: 18rem; height: auto;">
-                        <img src="data:image/png;base64,{{ image }}" style="width: 100%" alt="Random first slide">
+        <!-- Image Carousel -->
+        <div class="col-3">
+            <div style="display: flex;">
+                <div style="width: 2.5rem; padding-top: 200px; position: relative;;">
+                    <button class="btn" (click)="previousSelectedJewel()" style="position: absolute; left: 0%;"><i
+                            class="fa-solid fa-circle-arrow-left fa-xl" style="color: rgba(0, 0, 0, 0.6);"></i></button>
+                </div>
+                <div class="card bg-dark text-white add-padding" style="width: 18rem;">
+                    <ngb-carousel
+                        *ngIf="currentSelectedJewel && currentSelectedJewel.displayImages && currentSelectedJewel.displayImages.length">
+                        <ng-template ngbSlide *ngFor="let image of currentSelectedJewel.displayImages">
+                            <div class="wrapper card-img-top" style="width: 18rem; height: auto;">
+                                <img src="data:image/png;base64,{{ image }}" style="width: 100%"
+                                    alt="Random first slide">
+                            </div>
+                        </ng-template>
+                    </ngb-carousel>
+                    <div class="card-body" *ngIf="selectedJewel && selectedJewel.length">
+                        <h5 class="card-title">{{ currentSelectedJewel.category }}</h5>
+                        <div class="card-text">Weight: {{ currentSelectedJewel.weight }}</div>
+                        <div class="card-text">Purity: {{ currentSelectedJewel.purity }}</div>
+                        <div class="card-text">Price: {{ currentSelectedJewel.price }}</div>
+                        <button class="btn btn-light" style="text-transform: uppercase; margin: 5px; width: 100%;"
+                            (click)="addToCart(currentSelectedJewel)">Add to Cart</button>
                     </div>
-                </ng-template>
-            </ngb-carousel>
-            <div class="card-body" *ngIf="selectedJewel && selectedJewel.length">
-                <h5 class="card-title">{{ selectedJewel[0].category }}</h5>
-                <p class="card-text">Weight: {{selectedJewel[0].weight}}</p>
-                <p class="card-text">Purity: {{selectedJewel[0].purity}}</p>
-                <p class="card-text">Price: {{selectedJewel[0].price}}</p>
+                </div>
+                <div style="width: 2.5rem; position: relative; padding-top: 200px;">
+                    <button class="btn" (click)="nextSelectedJewel()" style="position: absolute; right: 0%;"><i
+                            style="color: rgba(0, 0, 0, 0.6);"
+                            class="fa-solid fa-circle-arrow-right fa-xl"></i></button>
+                </div>
             </div>
         </div>
     </div>
-</div>
 
-<!-- Jewellery Gallery -->
-<div style="width: 100%; background-color: lightgray;">
-    <button class="btn" (click)="previousPage()"><img src="../../../../assets/left-arrow.png" width="10px"></button>
-    <ng-container *ngFor="let jewel of jewelsToDisplay">
-        <button *ngIf="!jewel.isSelected" class="btn btn-dark col-1" style="margin: 8px;" (click)="changeJewel(jewel)">
-            <img src="data:image/png;base64,{{ jewel.image }}" width="100px" height="100px">
-        </button>
-        <button *ngIf="jewel.isSelected" class="btn btn-dark border border-4 border-warning col-1" style="margin: 8px;"
-            (click)="changeJewel(jewel)">
-            <img src="data:image/png;base64,{{ jewel.image }}" width="100px" height="100px">
-        </button>
-    </ng-container>
-    <button style="rotate: 180deg;" class="btn" (click)="nextPage()"><img src="../../../../assets/left-arrow.png"
-            width="10px"></button>
-</div>
-
-<!-- Jewel Categories Toggles -->
-<div style="background-color: black;">
-    <form [formGroup]="jewelCategoryFormGroup">
-        <input type="checkbox" class="btn-check" formControlName="All">
-        <label style="margin: 10px" class="btn btn-outline-light new-font" (click)="toggleCheckBoxes('All')"
-            for="btn-check-2-outlined">ALL CATEGORIES</label>
-        <input type="checkbox" class="btn-check" formControlName="Earring">
-        <label style="margin: 10px" class="btn btn-outline-light new-font" (click)="toggleCheckBoxes('Earring')"
-            for="btn-check-2-outlined">EARRINGS</label>
-        <input type="checkbox" class="btn-check" formControlName="Necklace">
-        <label style="margin: 10px" class="btn btn-outline-light new-font" (click)="toggleCheckBoxes('Necklace')"
-            for="btn-check-2-outlined">NECKLACE</label>
-        <input type="checkbox" class="btn-check" formControlName="Nethichutti">
-        <label style="margin: 10px" class="btn btn-outline-light new-font" (click)="toggleCheckBoxes('Nethichutti')"
-            for="btn-check-2-outlined">NETHICHUTTI</label>
-        <input type="checkbox" class="btn-check" formControlName="Nosepin">
-        <label style="margin: 10px" class="btn btn-outline-light new-font" (click)="toggleCheckBoxes('Nosepin')"
-            for="btn-check-2-outlined">NOSEPIN</label>
-    </form>
-</div>
-
-<!-- Dual Video Compare -->
-<div [ngStyle]="{'width': isCompareModeOn ? '100%' : '0%'}" class="full-screen">
-    <button class="btn btn-danger" (click)="disableCompareMode()" style="float: right; margin: 1%"><i
-            class="fa-solid fa-xmark"></i></button>
-    <video id="videoForComparison1" hidden="true" width="640" height="480"></video>
-    <button class="btn" (click)="toggleVideoInFocus(1)">
-        <canvas style="margin: 2%" hidden="true" id="canvasForComparison1" width="640" height="480"></canvas>
-    </button>
-    <video id="videoForComparison2" hidden="true" width="640" height="480"></video>
-    <button class="btn" (click)="toggleVideoInFocus(2)">
-        <canvas style="margin: 2%" hidden="true" id="canvasForComparison2" width="640" height="480"></canvas>
-    </button>
-    <div *ngIf="isCompareModeOn" style="background-color: lightgray;">
-        <button class="btn" (click)="goLeft()"><img src="../../../../assets/left-arrow.png" width="10px"></button>
+    <!-- Jewellery Gallery -->
+    <div style="width: 100%; background-color: lightgray;">
+        <button class="btn" (click)="previousPage()"><img src="../../../../assets/left-arrow.png" width="10px"></button>
         <ng-container *ngFor="let jewel of jewelsToDisplay">
-            <button class="btn btn-dark col-1" style="margin: 8px;" (click)="changeJewelForVideoInFocus(jewel)">
+            <button *ngIf="!jewel.isSelected" class="btn btn-dark col-1" style="margin: 8px;"
+                (click)="changeJewel(jewel)">
+                <img src="data:image/png;base64,{{ jewel.image }}" width="100px" height="100px">
+            </button>
+            <button *ngIf="jewel.isSelected" class="btn btn-dark border border-4 border-warning col-1"
+                style="margin: 8px;" (click)="changeJewel(jewel)">
                 <img src="data:image/png;base64,{{ jewel.image }}" width="100px" height="100px">
             </button>
         </ng-container>
-        <button style="rotate: 180deg;" class="btn" (click)="goRight()"><img src="../../../../assets/left-arrow.png"
+        <button style="rotate: 180deg;" class="btn" (click)="nextPage()"><img src="../../../../assets/left-arrow.png"
                 width="10px"></button>
     </div>
-</div>
 
-<!-- View Captured Images -->
-<div [ngStyle]="{'width': viewCapturedImages ? '100%' : '0%'}" class="full-screen">
-    <button class="btn btn-danger" (click)="exitFullScreen()" style="float: right; margin: 1%"><i
-            class="fa-solid fa-xmark"></i></button>
-    <div class="row" style="margin-top: 5vh; margin-left: 5vw; margin-right: 5vw;">
-        <div class="col-1 center">
-            <button *ngIf="viewCapturedImages" class="btn" (click)="prevImage()"><img
-                    src="../../../../assets/left-arrow-white.png" width="30px"></button>
-        </div>
-        <div *ngIf="viewCapturedImages" class="col-10" style="display: flex; justify-content: center;">
-            <img src="{{ currentCapturedImage }}">
-        </div>
-        <div class="col-1 center">
-            <button *ngIf="viewCapturedImages" style="rotate: 180deg;" class="btn" (click)="nextImage()"><img
-                    src="../../../../assets/left-arrow-white.png" width="30px"></button>
+    <!-- Jewel Categories Toggles -->
+    <div style="background-color: rgba(0, 0, 0, 0.6);">
+        <form [formGroup]="jewelCategoryFormGroup">
+            <input type="checkbox" class="btn-check" formControlName="All">
+            <label style="margin: 10px" class="btn btn-outline-light new-font" (click)="toggleCheckBoxes('All')"
+                for="btn-check-2-outlined">ALL CATEGORIES</label>
+            <input *ngIf="isEarringCategoryAvailable" type="checkbox" class="btn-check" formControlName="Earring">
+            <label *ngIf="isEarringCategoryAvailable" style="margin: 10px" class="btn btn-outline-light new-font" (click)="toggleCheckBoxes('Earring')"
+                for="btn-check-2-outlined">EARRINGS</label>
+            <input *ngIf="isNecklaceCategoryAvailable" type="checkbox" class="btn-check" formControlName="Necklace">
+            <label *ngIf="isNecklaceCategoryAvailable" style="margin: 10px" class="btn btn-outline-light new-font" (click)="toggleCheckBoxes('Necklace')"
+                for="btn-check-2-outlined">NECKLACE</label>
+            <input *ngIf="isNethichuttiCategoryAvailable" type="checkbox" class="btn-check" formControlName="Nethichutti">
+            <label *ngIf="isNethichuttiCategoryAvailable" style="margin: 10px" class="btn btn-outline-light new-font" (click)="toggleCheckBoxes('Nethichutti')"
+                for="btn-check-2-outlined">NETHICHUTTI</label>
+            <input *ngIf="isNosepinCategoryAvailable" type="checkbox" class="btn-check" formControlName="Nosepin">
+            <label *ngIf="isNosepinCategoryAvailable" style="margin: 10px" class="btn btn-outline-light new-font" (click)="toggleCheckBoxes('Nosepin')"
+                for="btn-check-2-outlined">NOSEPIN</label>
+        </form>
+    </div>
+
+    <!-- Dual Video Compare -->
+    <div [ngStyle]="{'width': isCompareModeOn ? '100%' : '0%'}" class="full-screen">
+        <button class="btn btn-danger" (click)="disableCompareMode()" style="float: right; margin: 1%"><i
+                class="fa-solid fa-xmark"></i></button>
+        <video id="videoForComparison1" hidden="true" width="640" height="480"></video>
+        <button class="btn" (click)="toggleVideoInFocus(1)">
+            <canvas style="margin: 2%" hidden="true" id="canvasForComparison1" width="640" height="480"></canvas>
+        </button>
+        <video id="videoForComparison2" hidden="true" width="640" height="480"></video>
+        <button class="btn" (click)="toggleVideoInFocus(2)">
+            <canvas style="margin: 2%" hidden="true" id="canvasForComparison2" width="640" height="480"></canvas>
+        </button>
+        <div *ngIf="isCompareModeOn" style="background-color: lightgray;">
+            <button class="btn" (click)="goLeft()"><img src="../../../../assets/left-arrow.png" width="10px"></button>
+            <ng-container *ngFor="let jewel of jewelsToDisplay">
+                <button class="btn btn-dark col-1" style="margin: 8px;" (click)="changeJewelForVideoInFocus(jewel)">
+                    <img src="data:image/png;base64,{{ jewel.image }}" width="100px" height="100px">
+                </button>
+            </ng-container>
+            <button style="rotate: 180deg;" class="btn" (click)="goRight()"><img src="../../../../assets/left-arrow.png"
+                    width="10px"></button>
         </div>
     </div>
-    <div *ngIf="viewCapturedImages">
-        <ng-container *ngFor="let image of capturedImages">
-            <button class="btn btn-light" (click)="viewSelectedImage(image)" style="margin: 1%;">
-                <img src="{{ image }}" width="160px" height="120px">
-            </button>
-        </ng-container>
-    </div>
-</div>
 
-<div *ngIf="isJeweller">
-    <div class="row">
-        <div style="float: right; padding: 10px;">
-            <button class="btn btn-secondary" (click)="openFileUploadModal()">Upload</button>
+    <!-- View Captured Images -->
+    <div [ngStyle]="{'width': viewCapturedImages ? '100%' : '0%'}" class="full-screen">
+        <button class="btn btn-danger" (click)="exitFullScreen()" style="float: right; margin: 1%"><i
+                class="fa-solid fa-xmark"></i></button>
+        <div class="row" style="margin-top: 5vh; margin-left: 5vw; margin-right: 5vw;">
+            <div class="col-1 center">
+                <button *ngIf="viewCapturedImages" class="btn" (click)="prevImage()"><img
+                        src="../../../../assets/left-arrow-white.png" width="30px"></button>
+            </div>
+            <div *ngIf="viewCapturedImages" class="col-10" style="display: flex; justify-content: center;">
+                <img src="{{ currentCapturedImage }}">
+            </div>
+            <div class="col-1 center">
+                <button *ngIf="viewCapturedImages" style="rotate: 180deg;" class="btn" (click)="nextImage()"><img
+                        src="../../../../assets/left-arrow-white.png" width="30px"></button>
+            </div>
+        </div>
+        <div *ngIf="viewCapturedImages">
+            <ng-container *ngFor="let image of capturedImages">
+                <button class="btn btn-light" (click)="viewSelectedImage(image)" style="margin: 1%;">
+                    <img src="{{ image }}" width="160px" height="120px">
+                </button>
+            </ng-container>
+        </div>
+        <div *ngIf="viewCapturedImages">
+            <button (click)="shareImage('whatsapp')"><i class="fa-brands fa-whatsapp"></i></button>
         </div>
     </div>
-</div>
-
-<div style="justify-content: center; text-align: center; font-size: medium; height: 30px">Powered by VReon</div>
+</ng-container>
 
 <!-- Image Upload Modal -->
 <ng-template #showImageUploadModal>

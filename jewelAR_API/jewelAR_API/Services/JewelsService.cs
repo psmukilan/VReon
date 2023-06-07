@@ -31,6 +31,12 @@ namespace jewelAR_API.Services
         public async Task<List<Jewel>> GetAllJewelsForJewellerIdWithPaginationAsync(string jewellerId, int pageNumber) =>
             await _jewelsCollection.Find(x => x.JewellerId == jewellerId).Skip((pageNumber-1) * 10).Limit(pageNumber * 10).ToListAsync();
 
+        public async Task<List<string>> GetAllJewelCategoriesForJewellerIdAsync(string jewellerId)
+        {
+            var jewels = await _jewelsCollection.Find(x => x.JewellerId == jewellerId).ToListAsync();
+            return jewels.Select(x => x.Category).Distinct().ToList();
+        }
+
         public async Task<Jewel?> GetAsync(string id) =>
             await _jewelsCollection.Find(x => x.Id == id).FirstOrDefaultAsync();
 

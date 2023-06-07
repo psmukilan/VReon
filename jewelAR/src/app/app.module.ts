@@ -6,7 +6,7 @@ import { HttpClientModule } from '@angular/common/http';
 
 import { AppComponent } from './app.component';
 import { HomePageComponent } from './components/home-page/home-page.component';
-import { UploadFileModalComponent } from './components/shared/modal/upload-file-modal.component';
+import { UploadFileModalComponent } from './components/shared/upload-modal/upload-file-modal.component';
 import { NgSelectModule } from '@ng-select/ng-select';
 import { RxReactiveFormsModule } from '@rxweb/reactive-form-validators';
 import { JewelService } from './services/jewel-service';
@@ -16,6 +16,9 @@ import { VideoArContentComponent } from './components/shared/video-ar-content/vi
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { LoginPageComponent } from './components/login-page/login-page/login-page.component';
+import { ShareButtonsModule } from 'ngx-sharebuttons/buttons';
+import { ShareIconsModule } from 'ngx-sharebuttons/icons';
+import { CartPageComponent } from './components/cart-page/cart-page.component';
 
 @NgModule({
   declarations: [
@@ -23,8 +26,9 @@ import { LoginPageComponent } from './components/login-page/login-page/login-pag
     HomePageComponent,
     UploadFileModalComponent,
     VideoArContentComponent,
-    LoginPageComponent
-    ],
+    LoginPageComponent,
+    CartPageComponent
+  ],
   imports: [
     BrowserModule,
     ModalModule.forRoot(),
@@ -35,11 +39,13 @@ import { LoginPageComponent } from './components/login-page/login-page/login-pag
     RxReactiveFormsModule,
     AppRoutingModule,
     BrowserAnimationsModule,
-    NgbModule
+    NgbModule,
+    ShareButtonsModule,
+    ShareIconsModule
   ],
   providers: [
     JewelService,
-    LoginService
+    LoginService,
   ],
   bootstrap: [AppComponent]
 })

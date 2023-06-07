@@ -12,6 +12,7 @@ namespace jewelAR_API.Models
         public string Email { get; set; }
         public string Password { get; set; }
         public bool IsJeweller { get; set; }
+        public string LogoImage { get; set; }
     }
 
     public class UserCredentials

@@ -1,0 +1,77 @@
+<div class="cart" style="background-image: url('../../../assets/video-bg.jpg'); background-size: 100%; height: 100vh;">
+    <div class="container" style="padding-top: 20px;">
+        <ul class="items">
+            <li *ngFor="let item of jewelsInCart; index as itemIndex" class="item">
+                <div class="preview">
+                    <img src="data:image/png;base64,{{ item.displayImages[0] }}" />
+                </div>
+                <div class="details">
+                    <h5>
+                        {{ item.category }}
+                    </h5>
+                </div>
+                <div style="position: relative; justify-content: space-evenly;">
+                    <div class="picker">
+                        <button (click)="decreaseQuantity(itemIndex)" class="btn btn-quantity minus">
+                            <i class="fas fa-minus"></i>
+                        </button>
+                        <div class="col_1of2 quantity-text">
+                            <span >{{ item.quantity }}</span>
+                        </div>
+                        <button (click)="increaseQuantity(itemIndex)" class="btn btn-quantity plus">
+                            <i class="fas fa-plus"></i>
+                        </button>
+                        <button (click)="deleteJewelFromCart(itemIndex)" style="margin-left: 20px; border-radius: 50px;" class="btn btn-outline-secondary">
+                            <i class="far fa-trash-alt"></i>
+                        </button>
+                    </div>
+                    <div style="position: absolute; bottom: 0; margin-bottom: 20px; width: 200px;">
+                        <button style="width: 100%" class="btn btn-secondary">&#8377;{{ item.totalPrice }}</button>
+                    </div>
+                </div>
+            </li>
+        </ul>
+        <div class="row">
+            <div class="col-4" style="margin-bottom: 20px;">
+                <h6>Name</h6>
+                <input type="text">
+            </div>
+            <div class="col-4" style="margin-bottom: 20px;">
+                <h6>Email</h6>
+                <input type="text">
+            </div>
+            <div class="col-4" style="margin-bottom: 20px;">
+                <h6>Phone Number</h6>
+                <input type="text">
+            </div>
+        </div>
+
+        <div class="grid_12 summary">
+            <div class="inner_container">
+                <div class="summary-content">
+                    <div class="col_1of2 meta-data">
+                        <div class="sub-total">
+                            Sub Total: <span class="amount"></span>
+                        </div>
+                        <div class="taxes">
+                            Plus GST: <span class="amount">@ {{gstPercent}}%</span>
+                        </div>
+
+                    </div>
+                    <div class="col_1of2">
+                        <div class="total">
+                            <span class="amount">&#8377; {{totalCartValue}}</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="btn-summary">
+
+                    <a role="button" (click)="resumeShopping()" class="btn-checkout btn-reverse">Continue Shopping</a>
+
+                    <a href="#" class="btn-checkout">Checkout</a>
+                    <a role="button" (click)="resetShopping()"><i class="fas fa-undo"></i></a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -27,7 +27,9 @@
               "./node_modules/bootstrap/dist/css/bootstrap.min.css",
               "./node_modules/@ng-select/ng-select/themes/material.theme.css",
               "./node_modules/@fortawesome/fontawesome-free/css/fontawesome.css",
-              "./node_modules/@fortawesome/fontawesome-free/css/solid.css"
+              "./node_modules/@fortawesome/fontawesome-free/css/solid.css",
+              "node_modules/ngx-sharebuttons/themes/circles.scss",
+              "node_modules/ngx-sharebuttons/themes/modern.scss"
             ],
             "scripts": [
               "./node_modules/bootstrap/dist/js/bootstrap.bundle.min.js",

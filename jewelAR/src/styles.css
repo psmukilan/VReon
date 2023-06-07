@@ -3,6 +3,7 @@
 @import url('https://fonts.googleapis.com/css?family=Amiko&display=swap');
 @import url('https://fonts.googleapis.com/css?family=Roboto&display=swap');
 
-html, body {
-    font-family: 'Gloock', sans-serif;
+html, body, div, button {
+    font-family: 'Amiko', sans-serif;
+    text-transform: uppercase;
 }

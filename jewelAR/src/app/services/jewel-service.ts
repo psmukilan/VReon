@@ -15,6 +15,7 @@ export class JewelService {
     private getJewelsByCategoryUrl = 'https://localhost:7292/api/Jewels/GetJewelsByCategory/';
     private getJewelsByCategoriesUrl = 'https://localhost:7292/api/Jewels/GetJewelsByCategories/';
     private getJewelsByCategoriesWithPaginationUrl = 'https://localhost:7292/api/Jewels/GetJewelsByCategoriesWithPagination/';
+    private getJewelCategoriesUrl = 'https://localhost:7292/api/Jewels/GetAllJewelCategoriesForJewellerId/';
 
     constructor(private http: HttpClient) {}
 
@@ -39,6 +40,14 @@ export class JewelService {
             params: {
                 jewellerId: jewellerId,
                 pageNumber: pageNumber
+            }
+        });
+    }
+
+    GetJewelCategoriesForJeweller(jewellerId: string): Observable<string[]> {
+        return this.http.get<string[]>(this.getJewelCategoriesUrl, {
+            params: {
+                jewellerId: jewellerId
             }
         });
     }

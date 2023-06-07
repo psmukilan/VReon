@@ -26,6 +26,10 @@ namespace jewelAR_API.Controllers
         public async Task<List<Jewel>> GetAllJewelsForJewellerIdWithPagination([FromQuery] string jewellerId, [FromQuery] int pageNumber) =>
             await _jewelsService.GetAllJewelsForJewellerIdWithPaginationAsync(jewellerId, pageNumber);
 
+        [HttpGet("GetAllJewelCategoriesForJewellerId")]
+        public async Task<List<string>> GetAllJewelCategoriesForJewellerId([FromQuery] string jewellerId) =>
+            await _jewelsService.GetAllJewelCategoriesForJewellerIdAsync(jewellerId);
+
         [HttpGet("{id:length(24)}")]
         public async Task<ActionResult<Jewel>> Get(string id)
         {

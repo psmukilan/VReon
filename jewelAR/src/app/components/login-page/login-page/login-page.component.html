@@ -1,48 +1,61 @@
 <body class="text-center">
-    <div class="form-signin w-100 m-auto">
-        <form [formGroup]="signInFormGroup">
-            <h1 class="h3 mb-3 fw-normal">Please sign in</h1>
-
-            <div class="form-floating">
-                <input type="email" formControlName="email" class="form-control" id="floatingInput">
-                <label for="floatingInput">Email address</label>
+    <div *ngIf="inLoginMode" class="flex-container">
+        <div class="content-container">
+            <div class="form-container">
+                <form [formGroup]="signInFormGroup">
+                    <h1>
+                        Login
+                    </h1>
+                    <br>
+                    <br>
+                    <span class="subtitle">EMAIL:</span>
+                    <br>
+                    <input type="email" formControlName="email" value="">
+                    <br>
+                    <span class="subtitle">PASSWORD:</span>
+                    <br>
+                    <input type="password" formControlName="password" value="">
+                    <br><br>
+                    <button style="width: 150px; margin-right: 15px;" type="submit" (click)="loginUser()" class="submit-btn">SUBMIT</button>
+                    <button style="width: 150px;" type="register" (click)="showRegistrationForm()" class="submit-btn">REGISTER</button>
+                </form>
+                <p style="color: red; margin: 20px;" *ngIf="isInvalidUser">Invalid Email or password</p>
+                <button style="color: rgba(255, 255, 255, 0.555); margin: 30px; text-transform: uppercase;" class="btn" (click)="loginDefaultUser()">Login as Guest</button>
             </div>
-            <div class="form-floating">
-                <input type="password" formControlName="password" class="form-control" id="floatingPassword">
-                <label for="floatingPassword">Password</label>
-            </div>
-
-            <div *ngIf="isInvalidUser" class="alert alert-danger" role="alert">
-                Invalid Email id or password
-            </div>
-
-            <div>
-                <button class="w-49 btn btn-lg btn-primary" style="margin: 5px;" type="submit"
-                    (click)="loginUser()">Sign in</button>
-            </div>
-            <!-- <a (click)="showRegistrationForm()">New User?</a> -->
-            <p class="mt-5 mb-3 text-body-secondary">© VReon</p>
-        </form>
+        </div>
+        
+        <footer style="color: rgba(255, 255, 255, 0.555);" class="mt-5 mb-3 text-body-secondary fixed-bottom">© VReon</footer>
     </div>
-    <ng-template #registerForm>
-        <form>
-            <h1 class="h3 mb-3 fw-normal">Please sign in</h1>
-
-            <div class="form-floating">
-                <input type="email" class="form-control" id="floatingInput" placeholder="jewelar@gmail.com">
-                <label for="floatingInput">Email address</label>
+    <div *ngIf="!inLoginMode" class="flex-container">
+        <div class="content-container">
+            <div class="form-container">
+                <form [formGroup]="registerFormGroup">
+                    <h1>
+                        Register
+                    </h1>
+                    <br>
+                    <br>
+                    <span class="subtitle">NAME:</span>
+                    <br>
+                    <input type="text" formControlName="name" value="">
+                    <br>
+                    <span class="subtitle">EMAIL:</span>
+                    <br>
+                    <input type="email" formControlName="email" value="">
+                    <br>
+                    <span class="subtitle">PASSWORD:</span>
+                    <br>
+                    <input type="password" formControlName="password" value="">
+                    <br>
+                    <span class="subtitle">LOGO:</span>
+                    <br>
+                    <input type="file" value="" (change)="onLogoSelected($event)">                    
+                    <br>
+                    <button style="width: 300px;" type="register" (click)="registerUser()" class="submit-btn">REGISTER</button>
+                </form>
             </div>
-            <div class="form-floating">
-                <input type="password" class="form-control" id="floatingPassword" placeholder="jewelar">
-                <label for="floatingPassword">Password</label>
-            </div>
-
-            <div>
-                <button class="w-49 btn btn-lg btn-primary" style="margin: 5px;" type="submit">Sign in</button>
-                <button class="w-49 btn btn-lg btn-primary" style="margin: 5px;" type="submit">Register</button>
-            </div>
-
-            <p class="mt-5 mb-3 text-body-secondary">© VReon</p>
-        </form>
-    </ng-template>
+        </div>
+        
+        <footer style="color: rgba(255, 255, 255, 0.555);" class="mt-5 mb-3 text-body-secondary fixed-bottom">© VReon</footer>
+    </div>
 </body>
