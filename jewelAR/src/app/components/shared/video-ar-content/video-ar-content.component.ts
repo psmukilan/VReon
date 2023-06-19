@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnInit, Output, SimpleChanges, TemplateRef, ViewChild } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output, TemplateRef, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { JewelCartInfo, JewelInfo } from 'src/app/models/jewel-info';
 import { JewelService } from 'src/app/services/jewel-service';
@@ -6,16 +6,12 @@ import * as facemesh from '@tensorflow-models/facemesh';
 import '@tensorflow/tfjs-backend-webgl';
 import { DetectJewel } from '../../../models/detectJewel';
 import { BsModalService, BsModalRef, ModalOptions } from 'ngx-bootstrap/modal';
-import { HttpClient } from '@angular/common/http';
 import { FormBuilder, FormControl, FormGroup } from '@angular/forms';
 import { LoginService } from 'src/app/services/login-service';
 import { UploadFileModalComponent } from '../upload-modal/upload-file-modal.component';
 import * as mpHands from '@tensorflow-models/handpose';
-import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
-import { ShareButtonsConfig, ShareService } from 'ngx-sharebuttons';
-import { takeUntil } from 'rxjs';
 import { UserInfo } from 'src/app/models/user-info';
-import { lessThanValidatorExtension } from '@rxweb/reactive-form-validators/validators-extension';
+import { JewelCategoryGroup } from 'src/app/models/jewel-properties';
 
 @Component({
   selector: 'app-video-ar-content',
@@ -56,24 +52,24 @@ export class VideoArContentComponent implements OnInit {
   isNecklaceCategoryAvailable: Boolean = true;
   isNethichuttiCategoryAvailable: Boolean = true;
   isNosepinCategoryAvailable: Boolean = true;
+  isRingCategoryAvailable: Boolean = true;
+  isBangleCategoryAvailable: Boolean = true;
   isAllJewelChecked: Boolean = true;
   previousXKeyPoint!: number;
   previousYKeyPoint!: number;
-  images = ["../../../../assets/earring-multiple-images/img1.jpg",
-    "../../../../assets/earring-multiple-images/img2.jpg",
-    "../../../../assets/earring-multiple-images/img3.jpg",
-    "../../../../assets/earring-multiple-images/img4.jpg"];
   displayImages: string[] = [];
   jewelCategoryFormGroup!: FormGroup;
   selectedJewelCategories: string[] = [];
   isJeweller: Boolean = false;
   pageNumber: number = 1;
-  shareButtonConfig!: ShareButtonsConfig;
   currentSelectedJewel!: JewelInfo;
   @Input() jewelsAlreadyInCart: JewelCartInfo[];
   jewelsInCart: JewelInfo[] = [];
   @Output() updateJewelsInCart = new EventEmitter<JewelCartInfo[]>();
   isJewelsAvailable: Boolean = true;
+  previousJewelCategoryGroup = "Face";
+  currentJewelCategoryGroup = "Face";
+  previousSelectedJewelCategory!: string;
 
   @ViewChild('showImageUploadModal', { read: TemplateRef }) showImageUploadModal !: TemplateRef<any>;
 
@@ -110,6 +106,7 @@ export class VideoArContentComponent implements OnInit {
       Necklace: new FormControl(false),
       Nethichutti: new FormControl(false),
       Nosepin: new FormControl(false),
+      Ring: new FormControl(false)
     });
   }
 
@@ -181,6 +178,8 @@ export class VideoArContentComponent implements OnInit {
       this.isNecklaceCategoryAvailable = categories.includes("Necklace");
       this.isNethichuttiCategoryAvailable = categories.includes("Nethichutti");
       this.isNosepinCategoryAvailable = categories.includes("Nosepin");
+      this.isRingCategoryAvailable = categories.includes("Ring");
+      this.isBangleCategoryAvailable = categories.includes("Bangle");
     });
   }
 
@@ -212,7 +211,10 @@ export class VideoArContentComponent implements OnInit {
 
     // Load the Facemesh model
     const model = await facemesh.load();
-    //const handpose = await mpHands.load();
+    let handPose: mpHands.HandPose;
+    if (this.detectHand) {
+      handPose = await mpHands.load();
+    }
 
     navigator.mediaDevices
       .getUserMedia({ video: true })
@@ -225,34 +227,56 @@ export class VideoArContentComponent implements OnInit {
           // Detect facial landmarks in real-time
           this.intervalId = setInterval(async () => {
             if (this.detectJewelOnMainCanvas) {
-              const predictions = await model.estimateFaces(inputVideo);
-              //const handpredictions = await handpose.estimateHands(inputVideo);
-              if (predictions && predictions.length) {
-                // Draw the facial landmarks on the canvas
-                const keypoints = predictions[0].scaledMesh as any[];
-                //const handKeyPoints = handpredictions[0].landmarks as any[];
-                let width = inputVideo.width;
-                let height = inputVideo.height;
-                inputCanvasContext.drawImage(this.video, 0, 0, width, height);
-                this.isLoading = false;
+              if (this.detectFace) {
+                const predictions = await model.estimateFaces(inputVideo);
+                if (predictions && predictions.length) {
+                  // Draw the facial landmarks on the canvas
+                  const keypoints = predictions[0].scaledMesh as any[];
+                  //const handKeyPoints = handpredictions[0].landmarks as any[];
+                  let width = inputVideo.width;
+                  let height = inputVideo.height;
+                  inputCanvasContext.drawImage(this.video, 0, 0, width, height);
+                  this.isLoading = false;
 
-                const referenceXKeyPoint = keypoints[168][0];
-                const referenceYKeyPoint = keypoints[168][1];
-                if (referenceXKeyPoint < (this.previousXKeyPoint - 10) || referenceXKeyPoint > (this.previousXKeyPoint + 10)) {
+                  const referenceXKeyPoint = keypoints[168][0];
+                  const referenceYKeyPoint = keypoints[168][1];
+                  if (referenceXKeyPoint < (this.previousXKeyPoint - 10) || referenceXKeyPoint > (this.previousXKeyPoint + 10)) {
 
+                  }
+                  this.selectedJewel.forEach((jewel) => {
+                    this.drawJewelOnCanvas(jewel, inputCanvasContext, keypoints, width, height);
+                  })
+
+                  this.previousXKeyPoint = referenceXKeyPoint;
+                  this.previousYKeyPoint = referenceYKeyPoint;
                 }
-                this.selectedJewel.forEach((jewel) => {
-                  this.drawJewelOnCanvas(jewel, inputCanvasContext, keypoints, width, height);
-                })
-
-                this.previousXKeyPoint = referenceXKeyPoint;
-                this.previousYKeyPoint = referenceYKeyPoint;
+                else {
+                  inputCanvasContext.clearRect(0, 0, this.canvas.width, this.canvas.height);
+                  const noFaceImage = new Image();
+                  noFaceImage.src = "../../../../assets/no-face-detected.png";
+                  inputCanvasContext.drawImage(noFaceImage, 0, 0, noFaceImage.width, noFaceImage.height);
+                }
               }
-              else {
-                inputCanvasContext.clearRect(0, 0, this.canvas.width, this.canvas.height);
-                const noFaceImage = new Image();
-                noFaceImage.src = "../../../../assets/no-face.png";
-                inputCanvasContext.drawImage(noFaceImage, 0, 0, noFaceImage.width, noFaceImage.height);
+              if (this.detectHand) {
+                const predictions = await handPose.estimateHands(inputVideo);
+                if (predictions && predictions.length) {
+                  // Draw the facial landmarks on the canvas
+                  const keypoints = predictions[0].landmarks as any[];
+                  let width = inputVideo.width;
+                  let height = inputVideo.height;
+                  inputCanvasContext.drawImage(this.video, 0, 0, width, height);
+                  this.isLoading = false;
+
+                  this.selectedJewel.forEach((jewel) => {
+                    this.drawJewelOnCanvas(jewel, inputCanvasContext, keypoints, width, height);
+                  })
+                }
+                else {
+                  inputCanvasContext.clearRect(0, 0, this.canvas.width, this.canvas.height);
+                  const noFaceImage = new Image();
+                  noFaceImage.src = "../../../../assets/no-hand-detected.png";
+                  inputCanvasContext.drawImage(noFaceImage, 0, 0, noFaceImage.width, noFaceImage.height);
+                }
               }
             }
           }, 200);
@@ -326,8 +350,7 @@ export class VideoArContentComponent implements OnInit {
         const currentRingImage = jewel.image;
         RingImage.src = "data:image/png;base64," + currentRingImage;
         RingImage.onload = (e) => {
-          ctx.drawImage(RingImage, ring_x - 50, ring_y, eyeDistanceForRing, eyeDistanceForRing);
-
+          ctx.drawImage(RingImage, ring_x - 155, ring_y - 200);
         }
         break;
 
@@ -413,28 +436,42 @@ export class VideoArContentComponent implements OnInit {
   }
 
   async detectLandmarksOnImage() {
+    this.initializeImageARElements();
     this.imageCanvasContext.clearRect(0, 0, this.imageCanvas.width, this.imageCanvas.height);
     this.imageCanvasContext.drawImage(this.image, 0, 0, this.image.width, this.image.height);
     this.image.hidden = true;
     this.imageCanvas.hidden = false;
 
     // Load the Facemesh model
-    const model = await facemesh.load();
-    const predictions = await model.estimateFaces(this.image);
+    if (this.detectFace) {
+      const model = await facemesh.load();
+      const predictions = await model.estimateFaces(this.image);
+      // Draw the facial landmarks on the canvas
+      const keypoints = predictions[0].scaledMesh as any[];
+      //const handKeyPoints = handPredictions && handPredictions.Length ? handPredictions[0].landmarks as any[] : [];
+      let width = this.image.width;
+      let height = this.image.height;
+      if (this.selectedJewel && this.selectedJewel.length) {
+        this.selectedJewel.forEach((jewel) => {
+          this.drawJewelOnCanvas(jewel, this.imageCanvasContext, keypoints, width, height);
+        })
+      }
+    }
 
     //Load the hand predictions model
-    // const handModel = await mpHands.load();
-    // const handPredictions = await handModel.estimateHands(this.image);
+    if (this.detectHand) {
+      const handModel = await mpHands.load();
+      const handPredictions = await handModel.estimateHands(this.image);
 
-    // Draw the facial landmarks on the canvas
-    const keypoints = predictions[0].scaledMesh as any[];
-    //const handKeyPoints = handPredictions && handPredictions.Length ? handPredictions[0].landmarks as any[] : [];
-    let width = this.image.width;
-    let height = this.image.height;
-    if (this.selectedJewel && this.selectedJewel.length) {
-      this.selectedJewel.forEach((jewel) => {
-        this.drawJewelOnCanvas(jewel, this.imageCanvasContext, keypoints, width, height);
-      })
+      // Draw the facial landmarks on the canvas
+      const keypoints = handPredictions[0].landmarks as any[];
+      let width = this.image.width;
+      let height = this.image.height;
+      if (this.selectedJewel && this.selectedJewel.length) {
+        this.selectedJewel.forEach((jewel) => {
+          this.drawJewelOnCanvas(jewel, this.imageCanvasContext, keypoints, width, height);
+        })
+      }
     }
   }
 
@@ -488,8 +525,8 @@ export class VideoArContentComponent implements OnInit {
     const videoCanvasContext1 = canvasForComparison1.getContext('2d') as CanvasRenderingContext2D;
     const videoCanvasContext2 = canvasForComparison2.getContext('2d') as CanvasRenderingContext2D;
 
-    this.detectJewelsOnVideo1.selectedJewels.push(this.jewels[0]);
-    this.detectJewelsOnVideo2.selectedJewels.push(this.jewels[1]);
+    this.detectJewelsOnVideo1.selectedJewels.push(this.jewelsToDisplay[0]);
+    this.detectJewelsOnVideo2.selectedJewels.push(this.jewelsToDisplay[1]);
 
     this.detectJewelsOnVideo1.detectLandmarks(videoForComparison1, videoCanvasContext1);
     this.detectJewelsOnVideo2.detectLandmarks(videoForComparison2, videoCanvasContext2);
@@ -609,6 +646,7 @@ export class VideoArContentComponent implements OnInit {
       this.jewelService.GetAllJewelsForJewellerIdWithPagination(this.jewellerId, this.pageNumber).subscribe((jewel) => {
         this.jewels = jewel;
         this.jewelsToDisplay = this.jewels.length > this.jewelDisplayConstant ? this.jewels.slice(0, this.jewelDisplayConstant) : this.jewels;
+        this.resetJewelsWhileSwitchingCategoryGroup();
         this.detectLandmarksOnImage();
       });
     }
@@ -616,19 +654,43 @@ export class VideoArContentComponent implements OnInit {
       this.pageNumber = 1;
       this.jewelService.GetJewelsByCategories(this.selectedJewelCategories, this.jewellerId, this.pageNumber).subscribe((jewel) => {
         this.jewels = jewel;
+        this.resetJewelsWhileSwitchingCategoryGroup();
         this.jewelsToDisplay = this.jewels.length > this.jewelDisplayConstant ? this.jewels.slice(0, this.jewelDisplayConstant) : this.jewels;
         this.detectLandmarksOnImage();
+        if (this.detectJewelOnMainCanvas && this.showVideo) {
+          this.detectLandmarks(this.video, this.videoCanvasContext);
+        }
       });
     }
   }
 
+  resetJewelsWhileSwitchingCategoryGroup() {
+    if ((this.previousJewelCategoryGroup == "Hand" && this.currentJewelCategoryGroup == "Face") || (this.previousJewelCategoryGroup == "Face" && this.currentJewelCategoryGroup == "Hand")) {
+      this.selectedJewel = [];
+      this.jewels[0].isSelected = true;
+      this.currentSelectedJewel = this.jewels[0];
+      this.selectedJewel.push(this.jewels[0]);
+    }
+  }
+
   toggleCheckBoxes(category: string) {
+    this.previousJewelCategoryGroup = this.selectedJewelCategories.every(x => JewelCategoryGroup.faceCategories.includes(x)) ? "Face" : "Hand";
+    this.currentJewelCategoryGroup = JewelCategoryGroup.faceCategories.includes(category) ? "Face" : "Hand";
+
+    this.detectFace = category == "Ring" ? false : true;
+    this.detectHand = category == "Ring" ? true : false;
+    if (this.detectHand) {
+      this.stopInterval();
+      this.jewelCategoryFormGroup.get('Ring').setValue(false);
+    }
+
     if (category == "All") {
       this.jewelCategoryFormGroup.get('All').setValue(true);
       this.jewelCategoryFormGroup.get('Earring').setValue(false);
       this.jewelCategoryFormGroup.get('Necklace').setValue(false);
       this.jewelCategoryFormGroup.get('Nethichutti').setValue(false);
       this.jewelCategoryFormGroup.get('Nosepin').setValue(false);
+      this.jewelCategoryFormGroup.get('Ring').setValue(false);
       this.selectedJewelCategories = [];
     } else {
       const previousValue: boolean = this.jewelCategoryFormGroup.get(category).value;
@@ -652,6 +714,14 @@ export class VideoArContentComponent implements OnInit {
     if (currentValue) {
       this.selectedJewelCategories.push(category);
       this.jewelCategoryFormGroup.get('All').setValue(false);
+      if (category == "Ring") {
+        this.jewelCategoryFormGroup.get('Earring').setValue(false);
+        this.jewelCategoryFormGroup.get('Necklace').setValue(false);
+        this.jewelCategoryFormGroup.get('Nethichutti').setValue(false);
+        this.jewelCategoryFormGroup.get('Nosepin').setValue(false);
+        this.jewelCategoryFormGroup.get('Ring').setValue(true);
+        this.selectedJewelCategories = ["Ring"];
+      }
     } else {
       const index = this.selectedJewelCategories.findIndex(x => x == category);
       this.selectedJewelCategories.splice(index, 1);
@@ -721,8 +791,10 @@ export class VideoArContentComponent implements OnInit {
     var cartJewel: JewelCartInfo[] = [];
     const transformJewelInfo = [jewel].map(item => new JewelCartInfo(item));
     if (this.jewelsAlreadyInCart && this.jewelsAlreadyInCart.length) {
-      this.jewelsAlreadyInCart.push(transformJewelInfo[0]);
-      this.updateJewelsInCart.emit(this.jewelsAlreadyInCart);
+      if (!this.jewelsAlreadyInCart.find(x => x.id == transformJewelInfo[0].id)) {
+        this.jewelsAlreadyInCart.push(transformJewelInfo[0]);
+        this.updateJewelsInCart.emit(this.jewelsAlreadyInCart);
+      }
     }
     else {
       cartJewel.push(transformJewelInfo[0]);

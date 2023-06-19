@@ -35,7 +35,7 @@ export class CartPageComponent implements OnInit, OnChanges {
       this.jewelsInCart[index].quantity--;
       this.jewelsInCart[index].totalPrice = this.jewelsInCart[index].quantity * this.jewelsInCart[index].price;
     }
-    else{
+    else {
       this.deleteJewelFromCart(index);
     }
     this.calculateCartValue();
@@ -46,16 +46,21 @@ export class CartPageComponent implements OnInit, OnChanges {
     this.calculateCartValue();
   }
 
-  calculateCartValue(){
+  calculateCartValue() {
     const total = this.jewelsInCart.reduce((sum, el) => sum += el.totalPrice, 0);
     this.totalCartValue = total + (0.18 * total);
   }
 
-  resumeShopping(){
+  resumeShopping() {
     this.continueShopping.emit(this.jewelsInCart);
   }
 
-  resetShopping(){
+  resetShopping() {
+    this.jewelsInCart = [];
+    this.continueShopping.emit(this.jewelsInCart);
+  }
+
+  checkout() {
     this.jewelsInCart = [];
     this.continueShopping.emit(this.jewelsInCart);
   }

@@ -101,9 +101,13 @@ export class LoginPageComponent implements OnInit {
   }
 
   loginDefaultUser() {
-    sessionStorage.setItem("loggedInUserId", "");
-    sessionStorage.setItem("IsJeweller", "");
-    this.router.navigate(['/home']);
+    this.loginService.GetDefaultUser().subscribe((jeweller) => {
+      sessionStorage.setItem("loggedInUserId", jeweller.id);
+      sessionStorage.setItem("IsJeweller", String(jeweller.isJeweller));
+      sessionStorage.setItem("loggedInUserName", String(jeweller.name));
+      sessionStorage.setItem("loggedInUserLogo", String(jeweller.logoImage));
+      this.router.navigate(['/home', { id: jeweller.id }]);
+    });
   }
 
   showRegistrationForm() {

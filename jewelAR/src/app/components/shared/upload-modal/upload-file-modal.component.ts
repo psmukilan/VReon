@@ -27,6 +27,7 @@ export class UploadFileModalComponent implements OnInit {
   jewelPurity = JewelProperties.purity;
   private _jewelService;
   unsubscribe = new Subject<void>();
+  isFormInValid = false;
 
   constructor(
     public modalService: BsModalService,
@@ -44,8 +45,8 @@ export class UploadFileModalComponent implements OnInit {
     return this.formBuilder.group({
       category: ['', Validators.required],
       purity: ['', Validators.required],
-      weight: ['', Validators.required],
-      price: ['', Validators.required],
+      weight: ['', Validators.required, Validators.pattern("^[0-9]*$")],
+      price: ['', Validators.required, Validators.pattern("^[0-9]*$")],
       tryOnImage: new FormControl(null, [Validators.required]),
       displayImages: new FormControl(null, [Validators.required]),
     });
@@ -56,23 +57,28 @@ export class UploadFileModalComponent implements OnInit {
   }
 
   submit() {
-    var jewelFormValues = this.assignFormValues();
-    this._jewelService
-      .AddJewelInfo(jewelFormValues)
-      .pipe(takeUntil(this.unsubscribe))
-      .subscribe();
-    this.jewelFormGroup.reset();
-    this.modalService.hide();
+    if (!this.jewelFormGroup.valid) {
+      this.isFormInValid = true;
+    } else {
+      var jewelFormValues = this.assignFormValues();
+      this._jewelService
+        .AddJewelInfo(jewelFormValues)
+        .pipe(takeUntil(this.unsubscribe))
+        .subscribe();
+      this.jewelFormGroup.reset();
+      this.modalService.hide();
+    }
   }
 
   assignFormValues() {
+    const loggedInUser = sessionStorage.getItem("loggedInUserId");
     let formValues = this.jewelFormGroup.value;
     let jewelInfo = new JewelInfo();
     jewelInfo.category = formValues.category;
     jewelInfo.purity = formValues.purity;
     jewelInfo.weight = formValues.weight;
     jewelInfo.price = formValues.price;
-    jewelInfo.jewellerId = '640062ee872031def6feed85';
+    jewelInfo.jewellerId = loggedInUser != null ? loggedInUser : '640062ee872031def6feed85';
     jewelInfo.image = this.selectedTryOnImage;
     jewelInfo.displayImages = this.selectedDisplayImages;
     return jewelInfo;
@@ -103,7 +109,7 @@ export class UploadFileModalComponent implements OnInit {
     let files = event.target.files as FileList;
 
     if (files && files.length) {
-        Array.from(files).forEach((file) => {
+      Array.from(files).forEach((file) => {
         var reader = new FileReader();
         reader.onload = this.handleDisplayImageSelection.bind(this);
         reader.readAsBinaryString(file);
