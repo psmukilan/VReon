@@ -2,8 +2,12 @@
 @import url('https://fonts.googleapis.com/css?family=Gloock&display=swap');
 @import url('https://fonts.googleapis.com/css?family=Amiko&display=swap');
 @import url('https://fonts.googleapis.com/css?family=Roboto&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=WindSong:wght@500&display=swap');
 
-html, body, div, button {
+html,
+body,
+div,
+button {
     font-family: 'Amiko', sans-serif;
     text-transform: uppercase;
 }

@@ -42,7 +42,11 @@ export class CartPageComponent implements OnInit, OnChanges {
   }
 
   deleteJewelFromCart(index: number) {
-    this.jewelsInCart = this.jewelsInCart.splice(index, 1);
+    if(this.jewelsInCart.length == 1){
+      this.jewelsInCart = [];
+    }else {
+      this.jewelsInCart = this.jewelsInCart.splice(index, 1);
+    }
     this.calculateCartValue();
   }
 

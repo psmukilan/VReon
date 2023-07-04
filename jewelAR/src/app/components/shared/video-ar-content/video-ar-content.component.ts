@@ -328,7 +328,7 @@ export class VideoArContentComponent implements OnInit {
         const currentNosePinImage = jewel.image;
         nosePinImage.src = "data:image/png;base64," + currentNosePinImage;
         nosePinImage.onload = (e) => {
-          ctx.drawImage(nosePinImage, Math.abs(nosePin_x - eyeDistanceForNosePin), Math.abs(nosePin_y - (eyeDistanceForNosePin * 0.9)), eyeDistanceForNosePin * 1.8, eyeDistanceForNosePin * 1.8);
+          ctx.drawImage(nosePinImage, nosePin_x - eyeDistanceForNosePin, nosePin_y - (eyeDistanceForNosePin * 0.9), eyeDistanceForNosePin * 1.8, eyeDistanceForNosePin * 1.8);
         }
         break;
 
@@ -339,7 +339,7 @@ export class VideoArContentComponent implements OnInit {
         const currentNethichuttiImage = jewel.image;
         nethichuttiImage.src = "data:image/png;base64," + currentNethichuttiImage;
         nethichuttiImage.onload = (e) => {
-          ctx.drawImage(nethichuttiImage, Math.abs(nethichutti_x - (eyeDistanceForNethichutti)), Math.abs(nethichutti_y - (eyeDistanceForNethichutti)), eyeDistanceForNethichutti * 2, eyeDistanceForNethichutti * 2);
+          ctx.drawImage(nethichuttiImage, nethichutti_x - (eyeDistanceForNethichutti), nethichutti_y - (eyeDistanceForNethichutti), eyeDistanceForNethichutti * 2, eyeDistanceForNethichutti * 2);
         }
         break;
 
