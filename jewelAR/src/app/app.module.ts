@@ -11,6 +11,7 @@ import { NgSelectModule } from '@ng-select/ng-select';
 import { RxReactiveFormsModule } from '@rxweb/reactive-form-validators';
 import { JewelService } from './services/jewel-service';
 import { LoginService } from './services/login-service';
+import { CartService } from './services/cart-service';
 import { AppRoutingModule } from './app-routing.module';
 import { VideoArContentComponent } from './components/shared/video-ar-content/video-ar-content.component';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
@@ -19,6 +20,7 @@ import { LoginPageComponent } from './components/login-page/login-page/login-pag
 import { ShareButtonsModule } from 'ngx-sharebuttons/buttons';
 import { ShareIconsModule } from 'ngx-sharebuttons/icons';
 import { CartPageComponent } from './components/cart-page/cart-page.component';
+import { AdminModalComponent } from './components/shared/admin-modal/admin-modal.component';
 
 @NgModule({
   declarations: [
@@ -27,7 +29,8 @@ import { CartPageComponent } from './components/cart-page/cart-page.component';
     UploadFileModalComponent,
     VideoArContentComponent,
     LoginPageComponent,
-    CartPageComponent
+    CartPageComponent,
+    AdminModalComponent
   ],
   imports: [
     BrowserModule,
@@ -41,11 +44,12 @@ import { CartPageComponent } from './components/cart-page/cart-page.component';
     BrowserAnimationsModule,
     NgbModule,
     ShareButtonsModule,
-    ShareIconsModule
+    ShareIconsModule,
   ],
   providers: [
     JewelService,
     LoginService,
+    CartService
   ],
   bootstrap: [AppComponent]
 })

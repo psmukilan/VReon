@@ -4,7 +4,7 @@ import {
   FormGroup,
   Validators,
 } from '@angular/forms';
-import { RegisterUser, UserCredentials, UserInfo } from 'src/app/models/user-info';
+import { RegisterUser, UserContact, UserCredentials, UserInfo } from 'src/app/models/user-info';
 import { LoginService } from 'src/app/services/login-service';
 import { Subject, takeUntil } from 'rxjs';
 import { Router } from '@angular/router';
@@ -18,13 +18,16 @@ export class LoginPageComponent implements OnInit {
   private _loginService;
   signInFormGroup!: FormGroup;
   registerFormGroup!: FormGroup;
+  userContactFormGroup!: FormGroup;
   loggedInUserId: string;
   unsubscribe = new Subject<void>();
   userCredentials: UserCredentials;
   isInvalidUser: Boolean = false;
   inLoginMode: Boolean = true;
+  showContactUs: Boolean = false;
   logoImage!: string;
   isRegistrationSuccessful: Boolean = true;
+  userContactSaved: Boolean = false;
 
   constructor(private formBuilder: FormBuilder, private loginService: LoginService, private router: Router) {
     this._loginService = loginService;
@@ -33,6 +36,7 @@ export class LoginPageComponent implements OnInit {
   ngOnInit(): void {
     this.signInFormGroup = this.initForm();
     this.registerFormGroup = this.initRegisterForm();
+    this.userContactFormGroup = this.initContactForm();
   }
 
 
@@ -48,6 +52,14 @@ export class LoginPageComponent implements OnInit {
       name: ['', Validators.required],
       email: ['', Validators.required],
       password: ['', Validators.required],
+    });
+  }
+
+  initContactForm() {
+    return this.formBuilder.group({
+      name: ['', Validators.required],
+      email: ['', Validators.required],
+      phoneNumber: ['', Validators.required],
     });
   }
 
@@ -68,6 +80,7 @@ export class LoginPageComponent implements OnInit {
           this.loggedInUserId = user.id;
           sessionStorage.setItem("loggedInUserId", this.loggedInUserId);
           sessionStorage.setItem("IsJeweller", String(user.isJeweller));
+          sessionStorage.setItem("IsAdmin", String(user.isAdmin));
           sessionStorage.setItem("loggedInUserName", String(user.name));
           sessionStorage.setItem("loggedInUserLogo", String(user.logoImage));
           this.router.navigate(['/home', { id: this.loggedInUserId }]);
@@ -83,6 +96,7 @@ export class LoginPageComponent implements OnInit {
     userToRegister.email = formValues.email;
     userToRegister.password = formValues.password;
     userToRegister.isJeweller = false;
+    userToRegister.isAdmin = false;
     userToRegister.logoImage = this.logoImage;
     this._loginService
       .RegisterUser(userToRegister)
@@ -92,6 +106,7 @@ export class LoginPageComponent implements OnInit {
           this.loggedInUserId = user.id;
           sessionStorage.setItem("loggedInUserId", this.loggedInUserId);
           sessionStorage.setItem("IsJeweller", String(user.isJeweller));
+          sessionStorage.setItem("IsAdmin", String(user.isAdmin));
           sessionStorage.setItem("loggedInUserName", String(user.name));
           sessionStorage.setItem("loggedInUserLogo", String(user.logoImage));
           this.router.navigate(['/home', { id: this.loggedInUserId }]);
@@ -127,5 +142,33 @@ export class LoginPageComponent implements OnInit {
   handleFile(event: any) {
     var binaryString = event.target.result;
     this.logoImage = btoa(binaryString);
+  }
+
+  showContactUsForm() {
+    this.inLoginMode = false;
+    this.showContactUs = true;
+  }
+
+  showLoginForm() {
+    this.inLoginMode = true;
+    this.showContactUs = false;
+  }
+
+  saveUserContact() {
+    const formValues = this.userContactFormGroup.value;
+    var userContact = new UserContact();
+    userContact.name = formValues.name;
+    userContact.email = formValues.email;
+    userContact.phoneNumber = formValues.phoneNumber;
+
+    this._loginService
+      .SaveUserContact(userContact)
+      .pipe(takeUntil(this.unsubscribe))
+      .subscribe({
+        next: (user) => {
+          this.userContactSaved = true;
+        },
+        error: (error) => { this.isRegistrationSuccessful = false; }
+      });
   }
 }

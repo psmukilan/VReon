@@ -40,6 +40,13 @@ namespace jewelAR_API.Controllers
             return CreatedAtAction(nameof(Get), new { id = newUser.Id }, newUser);
         }
 
+        [HttpPost("SaveUserContact")]
+        public async Task<IActionResult> SaveUserContact(UserContact newUser)
+        {
+            await _usersService.CreateUserContactAsync(newUser);
+            return CreatedAtAction(nameof(Get), new { id = newUser.Id }, newUser);
+        }
+
         [HttpPut("{id:length(24)}")]
         public async Task<IActionResult> Update(string id, User updatedUser)
         {
@@ -90,6 +97,12 @@ namespace jewelAR_API.Controllers
         public async Task<User> GetDefaultUser()
         {
             return await _usersService.GetDefaultUserAsync();
+        }
+
+        [HttpGet("GetJewellers")]
+        public async Task<List<User>> GetJewellers()
+        {
+            return await _usersService.GetJewellersAsync();
         }
     }
 }

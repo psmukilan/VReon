@@ -14,9 +14,10 @@
     </div>
 </nav>
 <div [style.width]="isSideNavOpen ? '250px' : '0px'" id="mySidenav" class="sidenav">
-    <a href="javascript:void(0)" class="closebtn" (click)="closeNav()">&times;</a>
-    <a *ngIf="isJeweller" (click)="openFileUploadModal()">Upload</a>
-    <a class="signOut" routerLink="/login">Sign Out</a>
+    <a href="javascript:void(0)" style="cursor: pointer;" class="closebtn" (click)="closeNav()">&times;</a>
+    <a *ngIf="isJeweller" style="cursor: pointer;" (click)="openFileUploadModal()">Upload</a>
+    <a *ngIf="isAdmin" style="cursor: pointer;" (click)="openAdminModal()">Admin Options</a>
+    <a class="signOut" style="cursor: pointer;" routerLink="/login">Sign Out</a>
 </div>
 <div style="background-color: black;">
     <div style="width: 100%;"></div>

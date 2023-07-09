@@ -38,18 +38,14 @@
             </li>
         </ul>
         <div class="row">
-            <div class="col-4" style="margin-bottom: 20px;">
-                <h6>Name</h6>
-                <input type="text">
-            </div>
-            <div class="col-4" style="margin-bottom: 20px;">
-                <h6>Email</h6>
-                <input type="text">
-            </div>
-            <div class="col-4" style="margin-bottom: 20px;">
-                <h6>Phone Number</h6>
-                <input type="text">
-            </div>
+            <form [formGroup]="contactFormGroup" style="display: flex; padding-bottom: 20px;">
+                <h6 class="contact-label">Name</h6>
+                <input type="text" formControlName="name">
+                <h6 class="contact-label">Email</h6>
+                <input type="text" formControlName="email">
+                <h6 class="contact-label">Phone Number</h6>
+                <input type="text" formControlName="phoneNumber">
+            </form>
         </div>
 
         <div class="grid_12 summary">

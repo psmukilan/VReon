@@ -35,3 +35,17 @@ export class JewelCartInfo{
         this.totalPrice = jewel.price;
     }
 }
+
+export class JewelCartDetails {
+    id: string;
+    price!: number;
+    quantity!: number;
+    totalJewelPrice!: number;
+
+    constructor(jewel: JewelCartInfo) {
+        this.id = jewel.id;
+        this.price = jewel.price;
+        this.quantity = jewel.quantity;
+        this.totalJewelPrice = jewel.totalPrice;
+    }
+}

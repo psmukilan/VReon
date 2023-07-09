@@ -9,6 +9,7 @@ builder.Services.Configure<JewelARDatabaseSettings>(
 
 builder.Services.AddSingleton<JewelsService>();
 builder.Services.AddSingleton<UsersService>();
+builder.Services.AddSingleton<CartService>();
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle

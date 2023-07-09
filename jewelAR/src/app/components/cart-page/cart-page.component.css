@@ -433,3 +433,9 @@ h1 {
     font-size: 30px;
     letter-spacing: 1rem;
 }
+
+.contact-label {
+    margin-top: 10px;
+    padding-right: 5px;
+    padding-left: 20px;
+}

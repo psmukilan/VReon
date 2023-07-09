@@ -1,5 +1,8 @@
 import { Component, EventEmitter, Input, OnChanges, OnInit, Output } from '@angular/core';
-import { JewelCartInfo, JewelInfo } from 'src/app/models/jewel-info';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { Cart } from 'src/app/models/cart';
+import { JewelCartDetails, JewelCartInfo, JewelInfo } from 'src/app/models/jewel-info';
+import { CartService } from 'src/app/services/cart-service';
 
 @Component({
   selector: 'app-cart-page',
@@ -13,10 +16,23 @@ export class CartPageComponent implements OnInit, OnChanges {
   jewelsInCart: JewelCartInfo[] = [];
   totalCartValue = 0;
   gstPercent = 18;
+  contactFormGroup: FormGroup;
+  private _cartService;
 
-  constructor() { }
+  constructor(private formBuilder: FormBuilder, private cartService: CartService) { 
+    this._cartService = cartService;
+  }
 
   ngOnInit(): void {
+    this.contactFormGroup = this.initContactFormGroup();
+  }
+
+  initContactFormGroup() {
+    return this.formBuilder.group({
+      name: ['', Validators.required],
+      email: ['', Validators.required],
+      phoneNumber: ['', Validators.required],
+    });
   }
 
   ngOnChanges(): void {
@@ -64,8 +80,23 @@ export class CartPageComponent implements OnInit, OnChanges {
     this.continueShopping.emit(this.jewelsInCart);
   }
 
+  assignCartDetails(): Cart {
+    const formValues = this.contactFormGroup.value;
+    var cartDetails = new Cart();
+    cartDetails.id = undefined;
+    cartDetails.name = formValues.name;
+    cartDetails.email = formValues.email;
+    cartDetails.phoneNumber = formValues.phoneNumber;
+    cartDetails.jewelCartDetails = this.jewelsInCart.map(x => new JewelCartDetails(x));
+    cartDetails.jewellerId = sessionStorage.getItem("loggedInUserId");
+    cartDetails.totalPrice = this.totalCartValue;
+    return cartDetails;
+  }
+
   checkout() {
-    this.jewelsInCart = [];
-    this.continueShopping.emit(this.jewelsInCart);
+    const cartDetails = this.assignCartDetails();
+    this._cartService.SaveCart(cartDetails).subscribe((cart) => {
+      this.jewelsInCart = [];
+    })
   }
 }

@@ -124,6 +124,7 @@ export class VideoArContentComponent implements OnInit {
             this.jewellerId = jeweller.id;
             sessionStorage.setItem("loggedInUserId", jeweller.id);
             sessionStorage.setItem("IsJeweller", String(jeweller.isJeweller));
+            sessionStorage.setItem("IsAdmin", String(jeweller.isAdmin));
             sessionStorage.setItem("loggedInUserName", String(jeweller.name));
             sessionStorage.setItem("loggedInUserLogo", String(jeweller.logoImage));
           }
@@ -143,6 +144,7 @@ export class VideoArContentComponent implements OnInit {
       this.jewellerId = jeweller.id;
       sessionStorage.setItem("loggedInUserId", jeweller.id);
       sessionStorage.setItem("IsJeweller", String(jeweller.isJeweller));
+      sessionStorage.setItem("IsAdmin", String(jeweller.isAdmin));
       sessionStorage.setItem("loggedInUserName", String(jeweller.name));
       sessionStorage.setItem("loggedInUserLogo", String(jeweller.logoImage));
       this.isJeweller = jeweller.isJeweller;

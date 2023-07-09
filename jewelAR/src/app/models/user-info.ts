@@ -5,6 +5,7 @@ export class UserInfo{
     password: string;
     isJeweller: Boolean;
     logoImage: string;
+    isAdmin: Boolean;
 }
 
 export class UserCredentials {
@@ -17,5 +18,12 @@ export class RegisterUser {
     email: string;
     password: string;
     isJeweller: Boolean;
+    isAdmin: Boolean;
     logoImage: string;
+}
+
+export class UserContact {
+    name: string;
+    email: string;
+    phoneNumber: string;
 }

@@ -7,6 +7,7 @@ namespace jewelAR_API.Services
     public class UsersService
     {
         private readonly IMongoCollection<User> _usersCollection;
+        private readonly IMongoCollection<UserContact> _userContactCollection;
 
         public UsersService(
             IOptions<JewelARDatabaseSettings> jewelARDatabaseSettings)
@@ -19,6 +20,9 @@ namespace jewelAR_API.Services
 
             _usersCollection = mongoDatabase.GetCollection<User>(
                 jewelARDatabaseSettings.Value.UsersCollectionName);
+
+            _userContactCollection = mongoDatabase.GetCollection<UserContact>(
+                jewelARDatabaseSettings.Value.UserContactsCollectionName);
         }
 
         public async Task<List<User>> GetAsync() =>
@@ -36,10 +40,16 @@ namespace jewelAR_API.Services
         public async Task CreateAsync(User newUser) =>
             await _usersCollection.InsertOneAsync(newUser);
 
+        public async Task CreateUserContactAsync(UserContact newUser) =>
+            await _userContactCollection.InsertOneAsync(newUser);
+
         public async Task UpdateAsync(string id, User updatedUser) =>
             await _usersCollection.ReplaceOneAsync(x => x.Id == id, updatedUser);
 
         public async Task RemoveAsync(string id) =>
             await _usersCollection.DeleteOneAsync(x => x.Id == id);
+
+        public async Task<List<User>> GetJewellersAsync() => 
+            await _usersCollection.Find(x => x.IsJeweller == true && x.IsAdmin == false).ToListAsync();
     }
 }

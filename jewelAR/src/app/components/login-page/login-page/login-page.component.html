@@ -1,61 +1,131 @@
 <body class="text-center">
-    <div *ngIf="inLoginMode" class="flex-container">
-        <div class="content-container">
-            <div class="form-container">
-                <form [formGroup]="signInFormGroup">
-                    <h1>
-                        Login
-                    </h1>
-                    <br>
-                    <br>
-                    <span class="subtitle">EMAIL:</span>
-                    <br>
-                    <input type="email" formControlName="email" value="">
-                    <br>
-                    <span class="subtitle">PASSWORD:</span>
-                    <br>
-                    <input type="password" formControlName="password" value="">
-                    <br><br>
-                    <button style="width: 150px; margin-right: 15px;" type="submit" (click)="loginUser()" class="submit-btn">SUBMIT</button>
-                    <button style="width: 150px;" type="register" (click)="showRegistrationForm()" class="submit-btn">REGISTER</button>
-                </form>
-                <p style="color: red; margin: 20px;" *ngIf="isInvalidUser">Invalid Email or password</p>
-                <button style="color: rgba(255, 255, 255, 0.555); margin: 30px; text-transform: uppercase;" class="btn" (click)="loginDefaultUser()">Login as Guest</button>
+    <div class="row">
+        <div *ngIf="inLoginMode && !showContactUs" class="col flex-container">
+            <div class="content-container">
+                <div class="form-container">
+                    <form [formGroup]="signInFormGroup">
+                        <h1>
+                            Login
+                        </h1>
+                        <br>
+                        <br>
+                        <span class="subtitle">EMAIL:</span>
+                        <br>
+                        <input type="email" formControlName="email" value="">
+                        <br>
+                        <span class="subtitle">PASSWORD:</span>
+                        <br>
+                        <input type="password" formControlName="password" value="">
+                        <br><br>
+                        <button style="width: 150px; margin-right: 15px;" type="submit" (click)="loginUser()"
+                            class="submit-btn">SUBMIT</button>
+                        <button style="width: 150px;" type="register" (click)="showRegistrationForm()"
+                            class="submit-btn">REGISTER</button>
+                    </form>
+                    <p style="color: red; margin: 20px;" *ngIf="isInvalidUser">Invalid Email or password</p>
+                    <button style="color: rgba(255, 255, 255, 0.555); margin: 30px; text-transform: uppercase;"
+                        class="btn" (click)="loginDefaultUser()">Login as Guest</button>
+                </div>
+            </div>
+
+            <footer style="color: rgba(255, 255, 255, 0.555);" class="mt-5 mb-3 text-body-secondary fixed-bottom">©
+                VReon</footer>
+        </div>
+        <div *ngIf="!inLoginMode && !showContactUs" class="col flex-container">
+            <div class="content-container">
+                <div class="form-container">
+                    <form [formGroup]="registerFormGroup">
+                        <h1>
+                            Register
+                        </h1>
+                        <br>
+                        <br>
+                        <span class="subtitle">NAME:</span>
+                        <br>
+                        <input type="text" formControlName="name" value="">
+                        <br>
+                        <span class="subtitle">EMAIL:</span>
+                        <br>
+                        <input type="email" formControlName="email" value="">
+                        <br>
+                        <span class="subtitle">PASSWORD:</span>
+                        <br>
+                        <input type="password" formControlName="password" value="">
+                        <br>
+                        <span class="subtitle">LOGO:</span>
+                        <br>
+                        <input type="file" value="" (change)="onLogoSelected($event)">
+                        <br>
+                        <button style="width: 300px;" type="register" (click)="registerUser()"
+                            class="submit-btn">REGISTER</button>
+                    </form>
+                </div>
+            </div>
+
+            <footer style="color: rgba(255, 255, 255, 0.555);" class="mt-5 mb-3 text-body-secondary fixed-bottom">©
+                VReon</footer>
+        </div>
+        <div *ngIf="!inLoginMode && showContactUs" class="col flex-container">
+            <div class="content-container">
+                <div class="form-container">
+                    <form [formGroup]="userContactFormGroup">
+                        <h1>
+                            Contact Us
+                        </h1>
+                        <br>
+                        <br>
+                        <span class="subtitle">NAME:</span>
+                        <br>
+                        <input type="text" formControlName="name" value="">
+                        <br>
+                        <span class="subtitle">EMAIL:</span>
+                        <br>
+                        <input type="email" formControlName="email" value="">
+                        <br>
+                        <span class="subtitle">PHONE NUMBER:</span>
+                        <br>
+                        <input type="text" formControlName="phoneNumber" value="">
+                        <br>
+                        <button style="width: 150px; margin-right: 15px;" type="submit" (click)="saveUserContact()"
+                            class="submit-btn">SUBMIT</button>
+                        <button style="width: 150px;" type="register" (click)="showLoginForm()"
+                            class="submit-btn">LOGIN</button>
+                        <div *ngIf="userContactSaved" style="color: white; padding-top: 20px;">Thanks! We will reach to you shortly</div>
+                    </form>
+                </div>
             </div>
         </div>
-        
-        <footer style="color: rgba(255, 255, 255, 0.555);" class="mt-5 mb-3 text-body-secondary fixed-bottom">© VReon</footer>
-    </div>
-    <div *ngIf="!inLoginMode" class="flex-container">
-        <div class="content-container">
-            <div class="form-container">
-                <form [formGroup]="registerFormGroup">
-                    <h1>
-                        Register
-                    </h1>
-                    <br>
-                    <br>
-                    <span class="subtitle">NAME:</span>
-                    <br>
-                    <input type="text" formControlName="name" value="">
-                    <br>
-                    <span class="subtitle">EMAIL:</span>
-                    <br>
-                    <input type="email" formControlName="email" value="">
-                    <br>
-                    <span class="subtitle">PASSWORD:</span>
-                    <br>
-                    <input type="password" formControlName="password" value="">
-                    <br>
-                    <span class="subtitle">LOGO:</span>
-                    <br>
-                    <input type="file" value="" (change)="onLogoSelected($event)">                    
-                    <br>
-                    <button style="width: 300px;" type="register" (click)="registerUser()" class="submit-btn">REGISTER</button>
-                </form>
+        <div class="col" style="width: 50vw; height: 100vh; background-color: rgba(0, 0, 0, 0.7);">
+            <div class="about">
+                About us
+            </div>
+            <div style="text-align: justify; display: flex; justify-content: center; color: white">
+                <ngb-carousel [interval]=2000>
+                    <ng-template ngbSlide>
+                        <div class="slide">
+                            <img src="../../../../assets/ring-try-about.png"
+                                style="max-height: 400px; width: auto; margin-left: 30px;">
+                            <p class="slide-text">Our Innovative solution allows customers to visualize and virtually
+                                try new designs</p>
+                        </div>
+                    </ng-template>
+                    <ng-template ngbSlide>
+                        <div class="slide">
+                            <img src="../../../../assets/about-image-try1.jpg" style="max-height: 400px; width: auto;">
+                            <p class="slide-text">Experience shopping like never before with mirror based AR/VR</p>
+                        </div>
+                    </ng-template>
+                    <ng-template ngbSlide>
+                        <div class="slide">
+                            <img src="../../../../assets/about-image2.jpg" style="max-height: 400px; width: auto;">
+                            <p class="slide-text">Make shopping experience immersive and fun</p>
+                        </div>
+                    </ng-template>
+                </ngb-carousel>
+            </div>
+            <div>
+                <button class="btn btn-warning" style="padding: 10px;" (click)="showContactUsForm()">CONTACT US</button>
             </div>
         </div>
-        
-        <footer style="color: rgba(255, 255, 255, 0.555);" class="mt-5 mb-3 text-body-secondary fixed-bottom">© VReon</footer>
     </div>
 </body>

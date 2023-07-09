@@ -4,6 +4,7 @@ import { JewelCartInfo, JewelInfo } from 'src/app/models/jewel-info';
 import { JewelService } from 'src/app/services/jewel-service';
 import { UploadFileModalComponent } from '../shared/upload-modal/upload-file-modal.component';
 import { Router } from '@angular/router';
+import { AdminModalComponent } from '../shared/admin-modal/admin-modal.component';
 
 @Component({
   selector: 'app-home-page',
@@ -21,20 +22,19 @@ export class HomePageComponent implements OnInit {
   jewellerName: string = "JEWELAR";
   jewellerLogo!: string;
   isJewellerLogoAvailable: Boolean = false;
+  isAdmin: Boolean = false;
 
   @ViewChild('showImageUploadModal', { read: TemplateRef }) showImageUploadModal !: TemplateRef<any>;
 
   constructor(
     private bsModalService: BsModalService,
-    private jewelService: JewelService,
-    private router: Router
-    ) {}
+  ) { }
 
   ngOnInit(): void {
-    if(sessionStorage.getItem("loggedInUserName")){
+    if (sessionStorage.getItem("loggedInUserName")) {
       this.jewellerName = sessionStorage.getItem("loggedInUserName");
     }
-    if(sessionStorage.getItem("loggedInUserLogo")){
+    if (sessionStorage.getItem("loggedInUserLogo")) {
       this.isJewellerLogoAvailable = true;
       this.jewellerLogo = sessionStorage.getItem("loggedInUserLogo");
     }
@@ -42,7 +42,9 @@ export class HomePageComponent implements OnInit {
 
   openNav() {
     let checkIfJeweller = sessionStorage.getItem("IsJeweller");
+    let checkIfAdmin = sessionStorage.getItem("IsAdmin");
     this.isJeweller = checkIfJeweller == "true" ? true : false;
+    this.isAdmin = checkIfAdmin == "true" ? true : false;
     this.isSideNavOpen = true;
   }
 
@@ -69,6 +71,17 @@ export class HomePageComponent implements OnInit {
     });
   }
 
+  openAdminModal() {
+    const initialState = {
+      title: 'Admin Options',
+    };
+
+    this.bsModalRef = this.bsModalService.show(AdminModalComponent, {
+      initialState,
+      class: 'modal-xl',
+    });
+  }
+
   openCartPage() {
     this.showJewels = false;
     this.showCart = true;
@@ -78,7 +91,7 @@ export class HomePageComponent implements OnInit {
     this.jewelsInCart = jewels;
   }
 
-  continueShopping(jewelsInCart: JewelCartInfo[]){
+  continueShopping(jewelsInCart: JewelCartInfo[]) {
     this.showJewels = true;
     this.showCart = false;
     this.jewelsInCart = jewelsInCart;
