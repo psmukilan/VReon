@@ -21,6 +21,9 @@ import { ShareButtonsModule } from 'ngx-sharebuttons/buttons';
 import { ShareIconsModule } from 'ngx-sharebuttons/icons';
 import { CartPageComponent } from './components/cart-page/cart-page.component';
 import { AdminModalComponent } from './components/shared/admin-modal/admin-modal.component';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatChipsModule } from '@angular/material/chips';
+import { MatIconModule } from '@angular/material/icon';
 
 @NgModule({
   declarations: [
@@ -45,7 +48,10 @@ import { AdminModalComponent } from './components/shared/admin-modal/admin-modal
     NgbModule,
     ShareButtonsModule,
     ShareIconsModule,
-  ],
+    MatFormFieldModule,
+    MatIconModule,
+    MatChipsModule
+    ],
   providers: [
     JewelService,
     LoginService,

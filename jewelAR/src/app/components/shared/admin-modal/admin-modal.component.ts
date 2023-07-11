@@ -5,11 +5,17 @@ import { JewelInfo } from 'src/app/models/jewel-info';
 import { JewelProperties } from 'src/app/models/jewel-properties';
 import { UserInfo } from 'src/app/models/user-info';
 import { LoginService } from 'src/app/services/login-service';
+import {COMMA, ENTER} from '@angular/cdk/keycodes';
+import {MatChipEvent, MatChipInputEvent, MatChipsModule} from '@angular/material/chips';
+import {MatIconModule} from '@angular/material/icon';
+import {NgFor} from '@angular/common';
+import {MatFormFieldModule} from '@angular/material/form-field';
+import {LiveAnnouncer} from '@angular/cdk/a11y';
 
 @Component({
   selector: 'app-admin-modal',
   templateUrl: './admin-modal.component.html',
-  styleUrls: ['./admin-modal.component.css']
+  styleUrls: ['./admin-modal.component.css'],
 })
 export class AdminModalComponent implements OnInit {
   title: string | undefined;
