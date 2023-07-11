@@ -67,7 +67,7 @@ export class HomePageComponent implements OnInit {
 
     this.bsModalRef = this.bsModalService.show(UploadFileModalComponent, {
       initialState,
-      class: 'modal-lg',
+      class: 'modal-xl',
     });
   }
 

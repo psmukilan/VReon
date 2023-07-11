@@ -11,10 +11,14 @@ namespace jewelAR_API.Models
         public string? Id { get; set; }
         public string JewellerId { get; set; }
         public string Category { get; set; } = null!;
+        public string? SubCategory { get; set; } = null!;
         public string Purity { get; set; }
+        public string MetalType { get; set; }
         public decimal Weight { get; set; }
         public decimal Price { get; set; }
         public string Image { get; set; }
         public string[] DisplayImages { get; set; }
+        public int? NecklaceLength { get; set; }
+        public string? Description { get; set; }
     }
 }

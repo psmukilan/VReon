@@ -14,6 +14,7 @@ namespace jewelAR_API.Models
         public bool IsJeweller { get; set; }
         public string LogoImage { get; set; }
         public bool IsAdmin { get; set; }
+        public string[]? AssignedCategories { get; set; }
     }
 
     public class UserCredentials

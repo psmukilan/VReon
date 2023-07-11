@@ -8,9 +8,9 @@
     <form [formGroup]="jewelOptionsFormGroup">
         <div class="row">
             <div class="col-12">
-                <label class="form-label" for="jewellerName">Jewellers</label>
-                <ng-select id="jewellerName" [items]="jewellers" bindLabel="name" bindValue="id" [multiple]="true"
-                    formControlName="jewellerName"></ng-select>
+                <label class="form-label" for="jeweller">Jewellers</label>
+                <ng-select id="jeweller" [items]="jewellers" bindLabel="name" (change)="loadExistingCategories($event)" [multiple]="false"
+                    formControlName="jeweller"></ng-select>
             </div>
         </div>
         <div class="row">

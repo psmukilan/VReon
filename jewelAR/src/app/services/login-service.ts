@@ -40,4 +40,8 @@ export class LoginService {
     GetJewellers() {
         return this.http.get<UserInfo[]>(this.getJewellersUrl);
     }
+
+    UpdateCategoriesForJeweller(id: number, updatedJeweller: UserInfo) {
+        return this.http.put<UserInfo>(this.registerUserUrl + "/" + id, updatedJeweller);
+    }
 }

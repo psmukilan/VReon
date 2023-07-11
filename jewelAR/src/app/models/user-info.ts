@@ -6,6 +6,7 @@ export class UserInfo{
     isJeweller: Boolean;
     logoImage: string;
     isAdmin: Boolean;
+    assignedCategories: string[];
 }
 
 export class UserCredentials {

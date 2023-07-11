@@ -1,11 +1,6 @@
 <div class="modal-header" style="background-color: rgb(55, 135, 226);">
   <h4 class="modal-title pull-left" style="color: white;">{{ title }}</h4>
-  <button
-    type="button"
-    class="btn btn-dark close pull-right"
-    aria-label="Close"
-    (click)="modalService.hide()"
-  >
+  <button type="button" class="btn btn-dark close pull-right" aria-label="Close" (click)="modalService.hide()">
     <span aria-hidden="true">&times;</span>
   </button>
 </div>
@@ -14,67 +9,52 @@
     <div class="row">
       <div class="col-6">
         <label class="form-label" for="category">Category</label>
-        <ng-select
-          id="category"
-          [items]="jewelCategories"
-          [closeOnSelect]="true"
-          formControlName="category"
-        ></ng-select>
+        <ng-select id="category" [items]="jewelCategories" (change)="checkIfNecklace($event)" [closeOnSelect]="true"
+          formControlName="category"></ng-select>
       </div>
       <div class="col-6">
+        <label class="form-label" for="subCategory">Sub Category</label>
+        <input id="subCategory" class="form-control" formControlName="subCategory" placeholder="Enter Subcategory" />
+      </div>
+    </div>
+    <div *ngIf="isNecklaceCategorySelected" class="row">
+      <label class="form-label" for="necklaceLength">Necklace Length in Inches</label>
+      <ng-select id="necklaceLength" [items]="necklaceLengths" [closeOnSelect]="true"
+        formControlName="necklaceLength"></ng-select>
+    </div>
+    <div class="row">
+      <div class="col-6">
         <label class="form-label" for="purity">Purity</label>
-        <ng-select
-          id="purity"
-          [items]="jewelPurity"
-          [closeOnSelect]="true"
-          formControlName="purity"
-        ></ng-select>
+        <input id="purity" class="form-control" formControlName="purity" placeholder="Enter purity" />
+      </div>
+      <div class="col-6">
+        <label class="form-label" for="metalType">Metal type</label>
+        <input id="purity" class="form-control" formControlName="metalType" placeholder="Enter Metal Type" />
       </div>
     </div>
     <div class="row">
       <div class="col-6">
         <label class="form-label" for="weight">Weight in grams</label>
-        <input
-          id="weight"
-          class="form-control"
-          formControlName="weight"
-          placeholder="Enter Weight"
-        />
+        <input type="number" id="weight" class="form-control" formControlName="weight" placeholder="Enter Weight" />
       </div>
       <div class="col-6">
         <label class="form-label" for="price">Price</label>
-        <input
-          id="price"
-          class="form-control"
-          formControlName="price"
-          placeholder="Enter Price"
-        />
+        <input type="number" id="price" class="form-control" formControlName="price" placeholder="Enter Price" />
       </div>
     </div>
     <div class="row" style="padding-top: 30px;">
       <label class="form-label" for="image">Try On Image</label>
-      <input
-        id="tryOnImage"
-        class="form-control col-12"
-        formControlName="tryOnImage"
-        [writeFile]="true"
-        type="file"
-        ng-file-model="files"
-        (change)="onFileSelected($event)"
-      />
+      <input id="tryOnImage" class="form-control col-12" formControlName="tryOnImage" [writeFile]="true" type="file"
+        ng-file-model="files" (change)="onFileSelected($event)" />
     </div>
     <div class="row" style="padding-top: 30px;">
       <label class="form-label" for="image">Display Images</label>
-      <input
-        id="displayImages"
-        class="form-control col-12"
-        formControlName="displayImages"
-        [writeFile]="true"
-        type="file"
-        multiple="true"
-        ng-file-model="files"
-        (change)="onDisplayImageSelected($event)"
-      />
+      <input id="displayImages" class="form-control col-12" formControlName="displayImages" [writeFile]="true"
+        type="file" multiple="true" ng-file-model="files" (change)="onDisplayImageSelected($event)" />
+    </div>
+    <div class="row">
+      <label class="form-label" for="description">Description</label>
+      <textarea id="description" formControlName="description"></textarea>
     </div>
   </form>
   <div *ngIf="isFormInValid" style="color: red">Form contains invalid information</div>

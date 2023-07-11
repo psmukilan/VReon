@@ -2,27 +2,18 @@ export class JewelInfo{
     id: string | undefined;
     jewellerId!: string;
     category!: string;
+    subCategory!: string;
     purity!: string;
+    metalType!: string;
     weight!: number;
     price!: number;
     image!: string;
     displayImages!: string[];
+    necklaceLength!: number;
+    description!: string;
     isSelected: Boolean = false;
-}
 
-export class JewelCartInfo{
-    id: string | undefined;
-    jewellerId!: string;
-    category!: string;
-    purity!: string;
-    weight!: number;
-    price!: number;
-    image!: string;
-    displayImages!: string[];
-    quantity!: number;
-    totalPrice!: number;
-
-    constructor(jewel: JewelInfo) {
+    constructor(jewel: JewelInfo){
         this.id = jewel.id;
         this.jewellerId = jewel.jewellerId;
         this.category = jewel.category;
@@ -31,6 +22,19 @@ export class JewelCartInfo{
         this.price = jewel.price;
         this.image = jewel.image;
         this.displayImages = jewel.displayImages;
+        this.subCategory = jewel.subCategory;
+        this.metalType = jewel.metalType;
+        this.necklaceLength = jewel.necklaceLength;
+        this.description = jewel.description;
+    }
+}
+
+export class JewelCartInfo extends JewelInfo{
+    quantity!: number;
+    totalPrice!: number;
+
+    constructor(jewel: JewelInfo) {
+        super(jewel);
         this.quantity = 1;
         this.totalPrice = jewel.price;
     }

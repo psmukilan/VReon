@@ -10,6 +10,8 @@ import { Subject, takeUntil } from 'rxjs';
 import { JewelInfo } from 'src/app/models/jewel-info';
 import { JewelService } from 'src/app/services/jewel-service';
 import { JewelProperties } from '../../../models/jewel-properties';
+import { LoginService } from 'src/app/services/login-service';
+import { image } from '@rxweb/reactive-form-validators';
 
 @Component({
   selector: 'app-modal',
@@ -26,29 +28,46 @@ export class UploadFileModalComponent implements OnInit {
   jewelCategories = JewelProperties.categories;
   jewelPurity = JewelProperties.purity;
   private _jewelService;
+  private _loginService;
   unsubscribe = new Subject<void>();
   isFormInValid = false;
+  necklaceLengths = [12, 14, 16, 20, 24, 28, 34, 38, 42];
+  isNecklaceCategorySelected: Boolean = false;
 
   constructor(
     public modalService: BsModalService,
     private formBuilder: FormBuilder,
-    private jewelService: JewelService
+    private jewelService: JewelService,
+    private loginService: LoginService
   ) {
     this._jewelService = jewelService;
+    this._loginService = loginService;
   }
 
   ngOnInit(): void {
     this.jewelFormGroup = this.initForm();
+    this.getJewellerDetails();
+  }
+
+  getJewellerDetails() {
+    const jewellerId = sessionStorage.getItem('loggedInUserId');
+    this._loginService.GetUserDetails(jewellerId).subscribe((jeweller) => {
+      this.jewelCategories = jeweller.assignedCategories;
+    });
   }
 
   initForm() {
     return this.formBuilder.group({
       category: ['', Validators.required],
+      subCategory: [''],
       purity: ['', Validators.required],
-      weight: ['', Validators.required, Validators.pattern("^[0-9]*$")],
-      price: ['', Validators.required, Validators.pattern("^[0-9]*$")],
+      weight: [, Validators.required, Validators.pattern("^[0-9]*$")],
+      metalType: ['', Validators.required],
+      price: [, Validators.required, Validators.pattern("^[0-9]*$")],
       tryOnImage: new FormControl(null, [Validators.required]),
       displayImages: new FormControl(null, [Validators.required]),
+      necklaceLength: [''],
+      description: ['']
     });
   }
 
@@ -57,7 +76,7 @@ export class UploadFileModalComponent implements OnInit {
   }
 
   submit() {
-    if (!this.jewelFormGroup.valid) {
+    if (this.jewelFormGroup.get('weight').errors?.['pattern'] || this.jewelFormGroup.controls['price'].errors?.['pattern']) {
       this.isFormInValid = true;
     } else {
       var jewelFormValues = this.assignFormValues();
@@ -73,15 +92,24 @@ export class UploadFileModalComponent implements OnInit {
   assignFormValues() {
     const loggedInUser = sessionStorage.getItem("loggedInUserId");
     let formValues = this.jewelFormGroup.value;
-    let jewelInfo = new JewelInfo();
-    jewelInfo.category = formValues.category;
-    jewelInfo.purity = formValues.purity;
-    jewelInfo.weight = formValues.weight;
-    jewelInfo.price = formValues.price;
-    jewelInfo.jewellerId = loggedInUser != null ? loggedInUser : '640062ee872031def6feed85';
-    jewelInfo.image = this.selectedTryOnImage;
-    jewelInfo.displayImages = this.selectedDisplayImages;
+    let jewelInfo = <JewelInfo>({
+      category: formValues.category,
+      purity: formValues.purity,
+      weight: formValues.weight,
+      price: formValues.price,
+      subCategory: formValues.subCategory,
+      metalType: formValues.metalType,
+      jewellerId: loggedInUser != null ? loggedInUser : '640062ee872031def6feed85',
+      image: this.selectedTryOnImage,
+      displayImages: this.selectedDisplayImages,
+      description:formValues.description
+    });
+    jewelInfo.necklaceLength = jewelInfo.category == "Necklace" ? formValues.necklaceLength : undefined;
     return jewelInfo;
+  }
+
+  checkIfNecklace(category: string) {
+    this.isNecklaceCategorySelected = category == "Necklace" ? true : false;
   }
 
   onFileSelected(event: any) {

@@ -3,6 +3,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { BsModalService } from 'ngx-bootstrap/modal';
 import { JewelInfo } from 'src/app/models/jewel-info';
 import { JewelProperties } from 'src/app/models/jewel-properties';
+import { UserInfo } from 'src/app/models/user-info';
 import { LoginService } from 'src/app/services/login-service';
 
 @Component({
@@ -26,11 +27,16 @@ export class AdminModalComponent implements OnInit {
     this.getJewellers();
   }
 
+  loadExistingCategories(jeweller: UserInfo) {
+    if(jeweller.assignedCategories && jeweller.assignedCategories.length){
+      this.jewelOptionsFormGroup.controls['category'].setValue(jeweller.assignedCategories);
+    }
+  }
+
   initForm() {
     return this.formBuilder.group({
-      jewellerName: [, Validators.required],
+      jeweller: [, Validators.required],
       category: [, Validators.required],
-      purity: [, Validators.required],
     });
   }
 
@@ -40,11 +46,20 @@ export class AdminModalComponent implements OnInit {
     });
   }
 
-  submit() {
+  assignFormValues() {
+    const formValues = this.jewelOptionsFormGroup.value;
+    let jeweller = formValues.jeweller;
+    jeweller.assignedCategories = formValues.category;
+    return jeweller;
+  }
 
+  submit() {
+    const jewellerToUpdate = this.assignFormValues();
+    this._loginService.UpdateCategoriesForJeweller(jewellerToUpdate.id, jewellerToUpdate).subscribe();
+    this.modalService.hide();
   }
 
   cancel() {
-
+    this.modalService.hide();
   }
 }
