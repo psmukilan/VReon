@@ -17,10 +17,16 @@
                         <br>
                         <input type="password" formControlName="password" value="">
                         <br><br>
-                        <button style="width: 150px; margin-right: 15px;" type="submit" (click)="loginUser()"
-                            class="submit-btn">SUBMIT</button>
-                        <button style="width: 150px;" type="register" (click)="showRegistrationForm()"
-                            class="submit-btn">REGISTER</button>
+                        <ng-container *ngIf="isVReonAdmin">
+                            <button style="width: 150px; margin-right: 15px;" type="submit" (click)="loginUser()"
+                                class="submit-btn">SUBMIT</button>
+                            <button style="width: 150px;" type="register" (click)="showRegistrationForm()"
+                                class="submit-btn">REGISTER</button>
+                        </ng-container>
+                        <ng-container *ngIf="!isVReonAdmin">
+                            <button style="width: 300px; margin-right: 15px;" type="submit" (click)="loginUser()"
+                                class="submit-btn">SUBMIT</button>
+                        </ng-container>
                     </form>
                     <p style="color: red; margin: 20px;" *ngIf="isInvalidUser">Invalid Email or password</p>
                     <button style="color: rgba(255, 255, 255, 0.555); margin: 30px; text-transform: uppercase;"
@@ -33,7 +39,7 @@
         </div>
         <div *ngIf="!inLoginMode && !showContactUs" class="col flex-container">
             <div class="content-container">
-                <div class="form-container">
+                <div style="height: 700px;" class="form-container">
                     <form [formGroup]="registerFormGroup">
                         <h1>
                             Register
@@ -55,6 +61,17 @@
                         <span class="subtitle">LOGO:</span>
                         <br>
                         <input type="file" value="" (change)="onLogoSelected($event)">
+                        <br>
+                        <span class="subtitle">CATEGORIES:</span>
+                        <br>
+                        <ng-select id="category" [items]="jewelCategories" [multiple]="true"
+                            formControlName="assignedCategories"></ng-select> <br>
+                        <span style="margin-left: 10px;" class="subtitle">ADMIN:</span>
+                        <input style="height: auto; width: auto;" type="checkbox" formControlName="vreonAdmin">
+                        <span style="margin-left: 10px;" class="subtitle">VREON ADMIN:</span>
+                        <input style="height: auto; width: auto;" type="checkbox" formControlName="admin">
+                        <span style="margin-left: 10px;" class="subtitle">JEWELLER:</span>
+                        <input style="height: auto; width: auto;" type="checkbox" formControlName="jeweller">
                         <br>
                         <button style="width: 300px;" type="register" (click)="registerUser()"
                             class="submit-btn">REGISTER</button>
@@ -90,7 +107,8 @@
                             class="submit-btn">SUBMIT</button>
                         <button style="width: 150px;" type="register" (click)="showLoginForm()"
                             class="submit-btn">LOGIN</button>
-                        <div *ngIf="userContactSaved" style="color: white; padding-top: 20px;">Thanks! We will reach to you shortly</div>
+                        <div *ngIf="userContactSaved" style="color: white; padding-top: 20px;">Thanks! We will reach to
+                            you shortly</div>
                     </form>
                 </div>
             </div>

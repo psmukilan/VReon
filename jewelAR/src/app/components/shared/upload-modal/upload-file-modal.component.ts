@@ -9,9 +9,8 @@ import { BsModalService } from 'ngx-bootstrap/modal';
 import { Subject, takeUntil } from 'rxjs';
 import { JewelInfo } from 'src/app/models/jewel-info';
 import { JewelService } from 'src/app/services/jewel-service';
-import { JewelProperties } from '../../../models/jewel-properties';
+import { JewelProperties, SubCategoriesForCategory } from '../../../models/jewel-properties';
 import { LoginService } from 'src/app/services/login-service';
-import { image } from '@rxweb/reactive-form-validators';
 
 @Component({
   selector: 'app-modal',
@@ -26,6 +25,9 @@ export class UploadFileModalComponent implements OnInit {
   selectedDisplayImages: string[] = [];
   jewelFormGroup!: FormGroup;
   jewelCategories = JewelProperties.categories;
+  allSubCategories : SubCategoriesForCategory[];
+  jewelSubCategories: string[] = [];
+  jewelMetalType = JewelProperties.metalType;
   jewelPurity = JewelProperties.purity;
   private _jewelService;
   private _loginService;
@@ -53,6 +55,9 @@ export class UploadFileModalComponent implements OnInit {
     const jewellerId = sessionStorage.getItem('loggedInUserId');
     this._loginService.GetUserDetails(jewellerId).subscribe((jeweller) => {
       this.jewelCategories = jeweller.assignedCategories;
+      this.allSubCategories = jeweller.jewelFields.subCategoriesForCategory ? jeweller.jewelFields.subCategoriesForCategory : [];
+      this.jewelPurity = jeweller.jewelFields.purity ? jeweller.jewelFields.purity : JewelProperties.purity;
+      this.jewelMetalType = jeweller.jewelFields.metalType ? jeweller.jewelFields.metalType : JewelProperties.metalType;
     });
   }
 
@@ -106,6 +111,12 @@ export class UploadFileModalComponent implements OnInit {
     });
     jewelInfo.necklaceLength = jewelInfo.category == "Necklace" ? formValues.necklaceLength : undefined;
     return jewelInfo;
+  }
+
+  getSubCategoriesForCategory(category: string){
+    let subCategories = this.allSubCategories.filter(x => x.category == category)[0].subCategory;
+    this.jewelSubCategories = subCategories;
+    this.checkIfNecklace(category);
   }
 
   checkIfNecklace(category: string) {

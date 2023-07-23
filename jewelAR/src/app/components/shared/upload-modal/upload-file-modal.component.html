@@ -9,12 +9,13 @@
     <div class="row">
       <div class="col-6">
         <label class="form-label" for="category">Category</label>
-        <ng-select id="category" [items]="jewelCategories" (change)="checkIfNecklace($event)" [closeOnSelect]="true"
+        <ng-select id="category" [items]="jewelCategories" (change)="getSubCategoriesForCategory($event)" [closeOnSelect]="true"
           formControlName="category"></ng-select>
       </div>
       <div class="col-6">
         <label class="form-label" for="subCategory">Sub Category</label>
-        <input id="subCategory" class="form-control" formControlName="subCategory" placeholder="Enter Subcategory" />
+        <ng-select id="subCategory" [items]="jewelSubCategories" [closeOnSelect]="true"
+          formControlName="subCategory"></ng-select>
       </div>
     </div>
     <div *ngIf="isNecklaceCategorySelected" class="row">
@@ -25,11 +26,13 @@
     <div class="row">
       <div class="col-6">
         <label class="form-label" for="purity">Purity</label>
-        <input id="purity" class="form-control" formControlName="purity" placeholder="Enter purity" />
+        <ng-select id="purity" [items]="jewelPurity" [closeOnSelect]="true"
+          formControlName="purity"></ng-select>
       </div>
       <div class="col-6">
         <label class="form-label" for="metalType">Metal type</label>
-        <input id="purity" class="form-control" formControlName="metalType" placeholder="Enter Metal Type" />
+        <ng-select id="metalType" [items]="jewelMetalType" [closeOnSelect]="true"
+          formControlName="metalType"></ng-select>
       </div>
     </div>
     <div class="row">

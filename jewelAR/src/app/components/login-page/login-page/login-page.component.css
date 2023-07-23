@@ -105,6 +105,13 @@ input {
     width: 300px;
 }
 
+ng-select {
+    border: none;
+    border-bottom: solid rgb(143, 143, 143) 1px;
+    background: none;
+    color: rgba(255, 255, 255, 0.555);
+}
+
 .submit-btn {
     cursor: pointer;
     border: none;

@@ -5,46 +5,54 @@
     </button>
 </div>
 <div class="modal-body" style="padding: 30px;">
-    <form [formGroup]="jewelOptionsFormGroup">
-        <div class="row">
-            <div class="col-12">
-                <label class="form-label" for="jeweller">Jewellers</label>
-                <ng-select id="jeweller" [items]="jewellers" bindLabel="name" (change)="loadExistingCategories($event)" [multiple]="false"
-                    formControlName="jeweller"></ng-select>
-            </div>
+    <div class="row" *ngFor="let subCategoryForCategory of subCategoriesForCategory; let i = index">
+        <div class="col-6">
+            <label class="form-label" for="category">Category</label>
+            <ng-select id="category" [items]="jewelCategories" [closeOnSelect]="true"
+                (change)="assignCategory($event, i)"></ng-select>
         </div>
-        <div class="row">
-            <div class="col-12">
-                <label class="form-label" for="category">Category</label>
-                <ng-select id="category" [items]="jewelCategories" [multiple]="true"
-                    formControlName="category"></ng-select>
-            </div>
+        <div class="col-6">
+            <mat-form-field class="example-chip-list" style="width: 100%; padding-top: 24px;">
+                <mat-chip-list #chipListSubCategory>
+                    <mat-chip *ngFor="let category of subCategoryForCategory.subCategory" [selectable]="selectable" [removable]="removable"
+                        (removed)="remove(category, 'subCategory', i)">
+                        {{category}}
+                        <mat-icon matChipRemove *ngIf="removable">cancel</mat-icon>
+                    </mat-chip>
+                    <input placeholder="New Subcategory..." [matChipInputFor]="chipListSubCategory"
+                        [matChipInputSeparatorKeyCodes]="separatorKeysCodes" [matChipInputAddOnBlur]="addOnBlur"
+                        (matChipInputTokenEnd)="add($event, 'subCategory', i)">
+                </mat-chip-list>
+            </mat-form-field>
         </div>
-        <div class="row">
-            <div class="col-12">
-                <mat-form-field class="example-chip-list">
-                    <mat-label>Favorite Fruits</mat-label>
-                    <mat-chip-grid #chipGrid aria-label="Enter fruits">
-                      <mat-chip-row *ngFor="let fruit of fruits"
-                                    (removed)="remove(fruit)"
-                                    [editable]="true"
-                                    (edited)="edit(fruit, $event)"
-                                    [aria-description]="'press enter to edit ' + fruit.name">
-                        {{fruit.name}}
-                        <button matChipRemove [attr.aria-label]="'remove ' + fruit.name">
-                          <mat-icon>cancel</mat-icon>
-                        </button>
-                      </mat-chip-row>
-                      <input placeholder="New fruit..."
-                             [matChipInputFor]="chipGrid"
-                             [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
-                             [matChipInputAddOnBlur]="addOnBlur"
-                             (matChipInputTokenEnd)="add($event)"/>
-                    </mat-chip-grid>
-                  </mat-form-field>                  
-            </div>
-        </div>
-    </form>
+    </div>
+    <button class="btn btn-primary" (click)="addCategoryField()">Add Category</button>
+    <div class="row">
+        <mat-form-field class="example-chip-list">
+            <mat-chip-list #chipListPurity>
+                <mat-chip *ngFor="let value of purity" [selectable]="selectable" [removable]="removable"
+                    (removed)="remove(value, 'purity')">
+                    {{value}}
+                    <mat-icon matChipRemove *ngIf="removable">cancel</mat-icon>
+                </mat-chip>
+                <input placeholder="New Purity..." [matChipInputFor]="chipListPurity"
+                    [matChipInputSeparatorKeyCodes]="separatorKeysCodes" [matChipInputAddOnBlur]="addOnBlur"
+                    (matChipInputTokenEnd)="add($event,'purity')">
+            </mat-chip-list>
+        </mat-form-field>
+        <mat-form-field class="example-chip-list">
+            <mat-chip-list #chipListMetalType>
+                <mat-chip *ngFor="let value of metalType" [selectable]="selectable" [removable]="removable"
+                    (removed)="remove(value, 'metalType')">
+                    {{value}}
+                    <mat-icon matChipRemove *ngIf="removable">cancel</mat-icon>
+                </mat-chip>
+                <input placeholder="New MetalType..." [matChipInputFor]="chipListMetalType"
+                    [matChipInputSeparatorKeyCodes]="separatorKeysCodes" [matChipInputAddOnBlur]="addOnBlur"
+                    (matChipInputTokenEnd)="add($event, 'metalType')">
+            </mat-chip-list>
+        </mat-form-field>
+    </div>
 </div>
 <div class="modal-footer">
     <button type="button" class="btn btn-primary" (click)="submit()">

@@ -1,3 +1,5 @@
+import { JewelFields } from "./jewel-properties";
+
 export class UserInfo{
     id: string;
     name: string;
@@ -7,6 +9,8 @@ export class UserInfo{
     logoImage: string;
     isAdmin: Boolean;
     assignedCategories: string[];
+    isVReonAdmin: Boolean;
+    jewelFields: JewelFields;
 }
 
 export class UserCredentials {
@@ -21,6 +25,8 @@ export class RegisterUser {
     isJeweller: Boolean;
     isAdmin: Boolean;
     logoImage: string;
+    isVReonAdmin: Boolean;
+    assignedCategories: string[];
 }
 
 export class UserContact {

@@ -15,6 +15,8 @@ namespace jewelAR_API.Models
         public string LogoImage { get; set; }
         public bool IsAdmin { get; set; }
         public string[]? AssignedCategories { get; set; }
+        public bool IsVReonAdmin { get; set; }
+        public JewelFields? JewelFields { get; set; }
     }
 
     public class UserCredentials

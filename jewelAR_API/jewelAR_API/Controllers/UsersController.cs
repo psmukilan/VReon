@@ -79,6 +79,20 @@ namespace jewelAR_API.Controllers
             return NoContent();
         }
 
+        [HttpPut("JewelFields")]
+        public async Task<IActionResult> PutJewelFields([FromBody] JewelFields jewelFields)
+        {
+            var jeweller = await _usersService.GetAsync(jewelFields.JewellerId);
+            if (jeweller is null)
+            {
+                return NotFound();
+            }
+
+            jeweller.JewelFields = jewelFields;
+            await _usersService.UpdateAsync(jeweller.Id, jeweller);
+            return NoContent();
+        }
+
         [HttpPost("ValidateUser")]
         public async Task<User?> ValidateUser([FromBody] UserCredentials userCredentials)
         {

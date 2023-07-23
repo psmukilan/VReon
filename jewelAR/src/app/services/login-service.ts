@@ -3,6 +3,7 @@ import { Injectable } from "@angular/core";
 import { Observable } from "rxjs";
 import { JewelInfo } from "../models/jewel-info";
 import { RegisterUser, UserContact, UserCredentials, UserInfo } from "../models/user-info";
+import { JewelFields } from "../models/jewel-properties";
 
 @Injectable({
     providedIn: 'root'
@@ -43,5 +44,9 @@ export class LoginService {
 
     UpdateCategoriesForJeweller(id: number, updatedJeweller: UserInfo) {
         return this.http.put<UserInfo>(this.registerUserUrl + "/" + id, updatedJeweller);
+    }
+
+    UpdateJewelFieldsForJeweller(jewelFields: JewelFields) {
+        return this.http.put<JewelFields>(this.registerUserUrl + "/JewelFields", jewelFields);
     }
 }

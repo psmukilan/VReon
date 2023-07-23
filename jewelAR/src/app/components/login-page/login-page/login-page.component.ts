@@ -8,6 +8,7 @@ import { RegisterUser, UserContact, UserCredentials, UserInfo } from 'src/app/mo
 import { LoginService } from 'src/app/services/login-service';
 import { Subject, takeUntil } from 'rxjs';
 import { Router } from '@angular/router';
+import { JewelProperties } from 'src/app/models/jewel-properties';
 
 @Component({
   selector: 'app-login-page',
@@ -28,17 +29,20 @@ export class LoginPageComponent implements OnInit {
   logoImage!: string;
   isRegistrationSuccessful: Boolean = true;
   userContactSaved: Boolean = false;
+  isVReonAdmin: Boolean = false;
+  jewelCategories = JewelProperties.categories;
 
   constructor(private formBuilder: FormBuilder, private loginService: LoginService, private router: Router) {
     this._loginService = loginService;
   }
 
   ngOnInit(): void {
+    let checkIfVReonAdmin = sessionStorage.getItem("IsVReonAdmin");
+    this.isVReonAdmin = checkIfVReonAdmin == "true" ? true : false;
     this.signInFormGroup = this.initForm();
     this.registerFormGroup = this.initRegisterForm();
     this.userContactFormGroup = this.initContactForm();
   }
-
 
   initForm() {
     return this.formBuilder.group({
@@ -52,6 +56,10 @@ export class LoginPageComponent implements OnInit {
       name: ['', Validators.required],
       email: ['', Validators.required],
       password: ['', Validators.required],
+      vreonAdmin: [false],
+      admin: [false],
+      jeweller: [false],
+      assignedCategories: []
     });
   }
 
@@ -64,9 +72,6 @@ export class LoginPageComponent implements OnInit {
   }
 
   loginUser() {
-    let formValues = this.signInFormGroup.value;
-    const email = formValues.email;
-    const password = formValues.password;
     this.userCredentials = this.signInFormGroup.value;
     this._loginService
       .ValidateUser(this.userCredentials)
@@ -78,9 +83,11 @@ export class LoginPageComponent implements OnInit {
         else {
           this.isInvalidUser = false;
           this.loggedInUserId = user.id;
+          sessionStorage.setItem("loggedInUser", JSON.stringify(user));
           sessionStorage.setItem("loggedInUserId", this.loggedInUserId);
           sessionStorage.setItem("IsJeweller", String(user.isJeweller));
           sessionStorage.setItem("IsAdmin", String(user.isAdmin));
+          sessionStorage.setItem("IsVReonAdmin", String(user.isVReonAdmin));
           sessionStorage.setItem("loggedInUserName", String(user.name));
           sessionStorage.setItem("loggedInUserLogo", String(user.logoImage));
           this.router.navigate(['/home', { id: this.loggedInUserId }]);
@@ -95,18 +102,22 @@ export class LoginPageComponent implements OnInit {
     userToRegister.name = formValues.name;
     userToRegister.email = formValues.email;
     userToRegister.password = formValues.password;
-    userToRegister.isJeweller = false;
-    userToRegister.isAdmin = false;
+    userToRegister.isJeweller = formValues.jeweller;
+    userToRegister.isAdmin = formValues.admin;
+    userToRegister.isVReonAdmin = formValues.vreonAdmin;
     userToRegister.logoImage = this.logoImage;
+    userToRegister.assignedCategories = formValues.assignedCategories;
     this._loginService
       .RegisterUser(userToRegister)
       .pipe(takeUntil(this.unsubscribe))
       .subscribe({
         next: (user) => {
           this.loggedInUserId = user.id;
+          sessionStorage.setItem("loggedInUser", JSON.stringify(user));
           sessionStorage.setItem("loggedInUserId", this.loggedInUserId);
           sessionStorage.setItem("IsJeweller", String(user.isJeweller));
           sessionStorage.setItem("IsAdmin", String(user.isAdmin));
+          sessionStorage.setItem("IsVReonAdmin", String(user.isVReonAdmin));
           sessionStorage.setItem("loggedInUserName", String(user.name));
           sessionStorage.setItem("loggedInUserLogo", String(user.logoImage));
           this.router.navigate(['/home', { id: this.loggedInUserId }]);
@@ -119,6 +130,8 @@ export class LoginPageComponent implements OnInit {
     this.loginService.GetDefaultUser().subscribe((jeweller) => {
       sessionStorage.setItem("loggedInUserId", jeweller.id);
       sessionStorage.setItem("IsJeweller", String(jeweller.isJeweller));
+      sessionStorage.setItem("IsVReonAdmin", String(jeweller.isVReonAdmin));
+      sessionStorage.setItem("IsAdmin", String(jeweller.isAdmin));
       sessionStorage.setItem("loggedInUserName", String(jeweller.name));
       sessionStorage.setItem("loggedInUserLogo", String(jeweller.logoImage));
       this.router.navigate(['/home', { id: jeweller.id }]);

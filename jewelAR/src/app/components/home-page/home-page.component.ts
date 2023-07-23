@@ -4,6 +4,7 @@ import { JewelCartInfo, JewelInfo } from 'src/app/models/jewel-info';
 import { JewelService } from 'src/app/services/jewel-service';
 import { UploadFileModalComponent } from '../shared/upload-modal/upload-file-modal.component';
 import { Router } from '@angular/router';
+import { VreonAdminModalComponent } from '../shared/vreon-admin-modal/vreon-admin-modal.component';
 import { AdminModalComponent } from '../shared/admin-modal/admin-modal.component';
 
 @Component({
@@ -23,6 +24,7 @@ export class HomePageComponent implements OnInit {
   jewellerLogo!: string;
   isJewellerLogoAvailable: Boolean = false;
   isAdmin: Boolean = false;
+  isVReonAdmin: Boolean = false;
 
   @ViewChild('showImageUploadModal', { read: TemplateRef }) showImageUploadModal !: TemplateRef<any>;
 
@@ -43,8 +45,12 @@ export class HomePageComponent implements OnInit {
   openNav() {
     let checkIfJeweller = sessionStorage.getItem("IsJeweller");
     let checkIfAdmin = sessionStorage.getItem("IsAdmin");
+    let checkIfVReonAdmin = sessionStorage.getItem("IsVReonAdmin");
+
     this.isJeweller = checkIfJeweller == "true" ? true : false;
     this.isAdmin = checkIfAdmin == "true" ? true : false;
+    this.isVReonAdmin = checkIfVReonAdmin == "true" ? true : false;
+
     this.isSideNavOpen = true;
   }
 
@@ -66,6 +72,17 @@ export class HomePageComponent implements OnInit {
     };
 
     this.bsModalRef = this.bsModalService.show(UploadFileModalComponent, {
+      initialState,
+      class: 'modal-xl',
+    });
+  }
+
+  openVReonAdminModal() {
+    const initialState = {
+      title: 'VReon Admin Options',
+    };
+
+    this.bsModalRef = this.bsModalService.show(VreonAdminModalComponent, {
       initialState,
       class: 'modal-xl',
     });

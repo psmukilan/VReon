@@ -1,71 +1,153 @@
+import { COMMA, ENTER } from '@angular/cdk/keycodes';
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { MatChipInputEvent } from '@angular/material/chips';
+import { even } from '@rxweb/reactive-form-validators';
 import { BsModalService } from 'ngx-bootstrap/modal';
 import { JewelInfo } from 'src/app/models/jewel-info';
-import { JewelProperties } from 'src/app/models/jewel-properties';
+import { JewelFields, JewelProperties, SubCategoriesForCategory } from 'src/app/models/jewel-properties';
 import { UserInfo } from 'src/app/models/user-info';
 import { LoginService } from 'src/app/services/login-service';
-import {COMMA, ENTER} from '@angular/cdk/keycodes';
-import {MatChipEvent, MatChipInputEvent, MatChipsModule} from '@angular/material/chips';
-import {MatIconModule} from '@angular/material/icon';
-import {NgFor} from '@angular/common';
-import {MatFormFieldModule} from '@angular/material/form-field';
-import {LiveAnnouncer} from '@angular/cdk/a11y';
 
 @Component({
   selector: 'app-admin-modal',
   templateUrl: './admin-modal.component.html',
-  styleUrls: ['./admin-modal.component.css'],
+  styleUrls: ['./admin-modal.component.css']
 })
 export class AdminModalComponent implements OnInit {
+
   title: string | undefined;
-  jewelOptionsFormGroup: FormGroup;
-  jewelCategories = JewelProperties.categories;
+  jewelFieldsFormGroup: FormGroup;
   private _loginService;
   jewellers: JewelInfo[];
+  purity: string[] = [];
+  metalType: string[] = [];
+  subCategoriesForCategory: SubCategoriesForCategory[] = [];
+
+  visible = true;
+  selectable = true;
+  removable = true;
+  addOnBlur = true;
+  readonly separatorKeysCodes: number[] = [ENTER, COMMA];
+  jewelCategories = JewelProperties.categories;
 
   constructor(public modalService: BsModalService, private formBuilder: FormBuilder, private loginService: LoginService) {
     this._loginService = loginService;
-   }
-
-  ngOnInit(): void {
-    this.jewelOptionsFormGroup = this.initForm();
-    this.getJewellers();
   }
 
-  loadExistingCategories(jeweller: UserInfo) {
-    if(jeweller.assignedCategories && jeweller.assignedCategories.length){
-      this.jewelOptionsFormGroup.controls['category'].setValue(jeweller.assignedCategories);
-    }
+  ngOnInit(): void {
+    this.jewelFieldsFormGroup = this.initForm();
+    this.getJewellerDetails();
+  }
+
+  getJewellerDetails() {
+    const jewellerId = sessionStorage.getItem('loggedInUserId');
+    this._loginService.GetUserDetails(jewellerId).subscribe((jeweller) => {
+      this.jewelCategories = jeweller.assignedCategories;
+      let intialSubCategory = <SubCategoriesForCategory>({
+        category: this.jewelCategories[1],
+        subCategory: []
+      });
+      this.subCategoriesForCategory.push(intialSubCategory);
+    });
   }
 
   initForm() {
     return this.formBuilder.group({
-      jeweller: [, Validators.required],
-      category: [, Validators.required],
-    });
-  }
-
-  getJewellers() {
-    this._loginService.GetJewellers().subscribe((jewellers) => {
-      this.jewellers = jewellers;
+      subCategory: [],
+      purity: [, Validators.required],
+      metalType: [, Validators.required],
     });
   }
 
   assignFormValues() {
-    const formValues = this.jewelOptionsFormGroup.value;
+    const formValues = this.jewelFieldsFormGroup.value;
     let jeweller = formValues.jeweller;
     jeweller.assignedCategories = formValues.category;
     return jeweller;
   }
 
   submit() {
-    const jewellerToUpdate = this.assignFormValues();
-    this._loginService.UpdateCategoriesForJeweller(jewellerToUpdate.id, jewellerToUpdate).subscribe();
+    const id = sessionStorage.getItem('loggedInUserId');
+    let jewelFields = <JewelFields>({
+      jewellerId: id,
+      subCategoriesForCategory: this.subCategoriesForCategory,
+      purity: this.purity,
+      metalType: this.metalType
+    })
+    this._loginService.UpdateJewelFieldsForJeweller(jewelFields).subscribe();
     this.modalService.hide();
   }
 
   cancel() {
     this.modalService.hide();
+  }
+
+  assignCategory(event: string, index: number) {
+    this.subCategoriesForCategory[index].category = event;
+  }
+
+  add(event: MatChipInputEvent, fieldName: string, index: number = 0): void {
+    const input = event.input;
+    const value = event.value;
+
+    // Add our fruit
+    if ((value || '').trim()) {
+      switch (fieldName) {
+        case "subCategory":
+          this.subCategoriesForCategory[index].subCategory.push(value.trim());
+          break;
+
+        case "purity":
+          this.purity.push(value.trim());
+          break;
+
+        case "metalType":
+          this.metalType.push(value.trim());
+          break;
+      }
+    }
+
+    // Reset the input value
+    if (input) {
+      input.value = '';
+    }
+  }
+
+  remove(value: string, fieldName: string, index: number = 0): void {
+    switch (fieldName) {
+      case "subCategory":
+        let fieldIndex = this.subCategoriesForCategory[index].subCategory.indexOf(value);
+
+        if (fieldIndex >= 0) {
+          this.subCategoriesForCategory[index].subCategory.splice(fieldIndex, 1);
+        }
+        break;
+      
+      case "purity":
+        let purityIndex = this.purity.indexOf(value);
+
+        if (purityIndex >= 0) {
+          this.purity.splice(purityIndex, 1);
+        }
+        break;
+      
+      case "metalType":
+        let metalTypeIndex = this.metalType.indexOf(value);
+
+        if (metalTypeIndex >= 0) {
+          this.metalType.splice(metalTypeIndex, 1);
+        }
+        break;
+    }
+
+  }
+
+  addCategoryField() {
+    let intialSubCategory = <SubCategoriesForCategory>({
+      category: this.jewelCategories[1],
+      subCategory: []
+    });
+    this.subCategoriesForCategory.push(intialSubCategory);
   }
 }

@@ -20,10 +20,11 @@ import { LoginPageComponent } from './components/login-page/login-page/login-pag
 import { ShareButtonsModule } from 'ngx-sharebuttons/buttons';
 import { ShareIconsModule } from 'ngx-sharebuttons/icons';
 import { CartPageComponent } from './components/cart-page/cart-page.component';
-import { AdminModalComponent } from './components/shared/admin-modal/admin-modal.component';
+import { VreonAdminModalComponent } from './components/shared/vreon-admin-modal/vreon-admin-modal.component';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatIconModule } from '@angular/material/icon';
+import { AdminModalComponent } from './components/shared/admin-modal/admin-modal.component';
 
 @NgModule({
   declarations: [
@@ -33,6 +34,7 @@ import { MatIconModule } from '@angular/material/icon';
     VideoArContentComponent,
     LoginPageComponent,
     CartPageComponent,
+    VreonAdminModalComponent,
     AdminModalComponent
   ],
   imports: [
