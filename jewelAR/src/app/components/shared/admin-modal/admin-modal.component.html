@@ -8,7 +8,7 @@
     <div class="row" *ngFor="let subCategoryForCategory of subCategoriesForCategory; let i = index">
         <div class="col-6">
             <label class="form-label" for="category">Category</label>
-            <ng-select id="category" [items]="jewelCategories" [closeOnSelect]="true"
+            <ng-select id="category" [(ngModel)]="subCategoryForCategory.category" [items]="jewelCategories" [closeOnSelect]="true"
                 (change)="assignCategory($event, i)"></ng-select>
         </div>
         <div class="col-6">
@@ -26,7 +26,7 @@
             </mat-form-field>
         </div>
     </div>
-    <button class="btn btn-primary" (click)="addCategoryField()">Add Category</button>
+    <button style="margin-bottom: 20px;" class="btn btn-primary" (click)="addCategoryField()">Add Category</button>
     <div class="row">
         <mat-form-field class="example-chip-list">
             <mat-chip-list #chipListPurity>

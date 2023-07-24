@@ -49,7 +49,20 @@ export class AdminModalComponent implements OnInit {
         subCategory: []
       });
       this.subCategoriesForCategory.push(intialSubCategory);
+      this.populateInitialValues(jeweller);
     });
+  }
+
+  populateInitialValues(info: UserInfo){
+    if(info.jewelFields && info.jewelFields.subCategoriesForCategory && info.jewelFields.subCategoriesForCategory.length) {
+      this.subCategoriesForCategory = info.jewelFields.subCategoriesForCategory
+    }
+    if(info.jewelFields && info.jewelFields.purity && info.jewelFields.purity.length){
+      this.purity = info.jewelFields.purity;
+    }
+    if(info.jewelFields && info.jewelFields.metalType && info.jewelFields.metalType.length){
+      this.metalType = info.jewelFields.metalType;
+    }
   }
 
   initForm() {
