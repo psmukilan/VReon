@@ -399,26 +399,41 @@ export class VideoArContentComponent implements OnInit {
         this.detectLandmarksOnImage();
       }
       else {
-        //removing previous jewel of same category and adding new jewel
-        this.selectedJewel.splice(jewelIndex, 1);
-        const alreadySelectedJewel = this.jewelsToDisplay.find(x => x.category == jewel.category && x.isSelected);
-        if (alreadySelectedJewel) {
-          alreadySelectedJewel.isSelected = false;
+        if (jewel.category == "Necklace") {
+          let subCategoryIndex = this.selectedJewel.findIndex(x => x.subCategory == jewel.subCategory);
+          if (subCategoryIndex < 0) {
+            this.setJewelProperties(jewel);
+          } else {
+            //removing previous jewel of same subcategory and adding new jewel
+            this.selectedJewel.splice(jewelIndex, 1);
+            const alreadySelectedJewel = this.jewelsToDisplay.find(x => x.category == jewel.category && x.isSelected);
+            if (alreadySelectedJewel) {
+              alreadySelectedJewel.isSelected = false;
+            }
+            this.setJewelProperties(jewel);
+          }
+        } else {
+          //removing previous jewel of same category and adding new jewel
+          this.selectedJewel.splice(jewelIndex, 1);
+          const alreadySelectedJewel = this.jewelsToDisplay.find(x => x.category == jewel.category && x.isSelected);
+          if (alreadySelectedJewel) {
+            alreadySelectedJewel.isSelected = false;
+          }
+          this.setJewelProperties(jewel);
         }
-        this.selectedJewel.push(jewel);
-        jewel.isSelected = true;
-        this.displayImages = jewel.displayImages;
-        this.currentSelectedJewel = jewel;
-        this.detectLandmarksOnImage();
       }
     }
     else {
-      this.selectedJewel.push(jewel);
-      jewel.isSelected = true;
-      this.displayImages = jewel.displayImages;
-      this.currentSelectedJewel = jewel;
-      this.detectLandmarksOnImage();
+      this.setJewelProperties(jewel);
     }
+  }
+
+  setJewelProperties(jewel: JewelInfo) {
+    this.selectedJewel.push(jewel);
+    jewel.isSelected = true;
+    this.displayImages = jewel.displayImages;
+    this.currentSelectedJewel = jewel;
+    this.detectLandmarksOnImage();
   }
 
   goRight() {
@@ -528,9 +543,6 @@ export class VideoArContentComponent implements OnInit {
 
     const videoCanvasContext1 = canvasForComparison1.getContext('2d') as CanvasRenderingContext2D;
     const videoCanvasContext2 = canvasForComparison2.getContext('2d') as CanvasRenderingContext2D;
-
-    this.detectJewelsOnVideo1.selectedJewels.push(this.jewelsToDisplay[0]);
-    this.detectJewelsOnVideo2.selectedJewels.push(this.jewelsToDisplay[1]);
 
     this.detectJewelsOnVideo1.detectLandmarks(videoForComparison1, videoCanvasContext1);
     this.detectJewelsOnVideo2.detectLandmarks(videoForComparison2, videoCanvasContext2);
@@ -681,11 +693,18 @@ export class VideoArContentComponent implements OnInit {
     this.previousJewelCategoryGroup = this.selectedJewelCategories.every(x => JewelCategoryGroup.faceCategories.includes(x)) ? "Face" : "Hand";
     this.currentJewelCategoryGroup = JewelCategoryGroup.faceCategories.includes(category) ? "Face" : "Hand";
 
-    this.detectFace = category == "Ring" ? false : true;
-    this.detectHand = category == "Ring" ? true : false;
-    if (this.detectHand) {
+    if(this.previousJewelCategoryGroup == "Face" && this.currentJewelCategoryGroup == "Hand"){
+      this.detectHand = true;
+      this.detectFace = false;
+      this.stopInterval();
+    }
+    
+    if(this.previousJewelCategoryGroup == "Hand" && this.currentJewelCategoryGroup == "Face") {
+      this.detectFace = true;
+      this.detectHand = false;
       this.stopInterval();
       this.jewelCategoryFormGroup.get('Ring').setValue(false);
+      this.addOrRemoveJewelCategory("Ring", false);
     }
 
     if (category == "All") {

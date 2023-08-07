@@ -18,6 +18,7 @@ import { LoginService } from 'src/app/services/login-service';
   styleUrls: ['./upload-file-modal.component.css'],
 })
 export class UploadFileModalComponent implements OnInit {
+  [x: string]: any;
   title: string | undefined;
   message: string | undefined;
   options: string[] = [];
@@ -25,7 +26,7 @@ export class UploadFileModalComponent implements OnInit {
   selectedDisplayImages: string[] = [];
   jewelFormGroup!: FormGroup;
   jewelCategories = JewelProperties.categories;
-  allSubCategories : SubCategoriesForCategory[];
+  allSubCategories: SubCategoriesForCategory[];
   jewelSubCategories: string[] = [];
   jewelMetalType = JewelProperties.metalType;
   jewelPurity = JewelProperties.purity;
@@ -35,6 +36,7 @@ export class UploadFileModalComponent implements OnInit {
   isFormInValid = false;
   necklaceLengths = [12, 14, 16, 20, 24, 28, 34, 38, 42];
   isNecklaceCategorySelected: Boolean = false;
+  isSubmitted: Boolean = false;
 
   constructor(
     public modalService: BsModalService,
@@ -81,7 +83,14 @@ export class UploadFileModalComponent implements OnInit {
   }
 
   submit() {
-    if (this.jewelFormGroup.get('weight').errors?.['pattern'] || this.jewelFormGroup.controls['price'].errors?.['pattern']) {
+    this.isSubmitted = true;
+    if (this.jewelFormGroup.get('weight').errors?.['pattern'] ||
+      this.jewelFormGroup.controls['price'].errors?.['pattern'] ||
+      this.selectedTryOnImage == undefined ||
+      this.selectedDisplayImages.length == 0 ||
+      this.jewelFormGroup.get('weight').value <= 0 ||
+      this.jewelFormGroup.get('price').value <= 0
+    ) {
       this.isFormInValid = true;
     } else {
       var jewelFormValues = this.assignFormValues();
@@ -89,6 +98,7 @@ export class UploadFileModalComponent implements OnInit {
         .AddJewelInfo(jewelFormValues)
         .pipe(takeUntil(this.unsubscribe))
         .subscribe();
+      this.isSubmitted = false;
       this.jewelFormGroup.reset();
       this.modalService.hide();
     }
@@ -107,13 +117,13 @@ export class UploadFileModalComponent implements OnInit {
       jewellerId: loggedInUser != null ? loggedInUser : '640062ee872031def6feed85',
       image: this.selectedTryOnImage,
       displayImages: this.selectedDisplayImages,
-      description:formValues.description
+      description: formValues.description
     });
     jewelInfo.necklaceLength = jewelInfo.category == "Necklace" ? formValues.necklaceLength : undefined;
     return jewelInfo;
   }
 
-  getSubCategoriesForCategory(category: string){
+  getSubCategoriesForCategory(category: string) {
     let subCategories = this.allSubCategories.filter(x => x.category == category)[0].subCategory;
     this.jewelSubCategories = subCategories;
     this.checkIfNecklace(category);

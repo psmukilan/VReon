@@ -31,6 +31,8 @@ export class LoginPageComponent implements OnInit {
   userContactSaved: Boolean = false;
   isVReonAdmin: Boolean = false;
   jewelCategories = JewelProperties.categories;
+  isLoginSubmitted: Boolean = false;
+  isRegisterSubmitted: Boolean = false;
 
   constructor(private formBuilder: FormBuilder, private loginService: LoginService, private router: Router) {
     this._loginService = loginService;
@@ -46,84 +48,93 @@ export class LoginPageComponent implements OnInit {
 
   initForm() {
     return this.formBuilder.group({
-      email: ['', Validators.required],
+      email: ['', [Validators.required, Validators.email]],
       password: ['', Validators.required],
     });
   }
 
   initRegisterForm() {
     return this.formBuilder.group({
-      name: ['', Validators.required],
-      email: ['', Validators.required],
+      name: ['', [Validators.required, Validators.pattern("[a-zA-Z][a-zA-Z ]+")]],
+      email: ['', [Validators.required, Validators.email]],
       password: ['', Validators.required],
       vreonAdmin: [false],
       admin: [false],
       jeweller: [false],
-      assignedCategories: []
+      assignedCategories: ['', Validators.required]
     });
   }
 
   initContactForm() {
     return this.formBuilder.group({
-      name: ['', Validators.required],
-      email: ['', Validators.required],
+      name: ['', [Validators.required, Validators.pattern("[a-zA-Z][a-zA-Z ]+")]],
+      email: ['', [Validators.required, Validators.email]],
       phoneNumber: ['', Validators.required],
     });
   }
 
   loginUser() {
     this.userCredentials = this.signInFormGroup.value;
-    this._loginService
-      .ValidateUser(this.userCredentials)
-      .pipe(takeUntil(this.unsubscribe))
-      .subscribe((user: UserInfo) => {
-        if (user == null) {
-          this.isInvalidUser = true;
-        }
-        else {
-          this.isInvalidUser = false;
-          this.loggedInUserId = user.id;
-          sessionStorage.setItem("loggedInUser", JSON.stringify(user));
-          sessionStorage.setItem("loggedInUserId", this.loggedInUserId);
-          sessionStorage.setItem("IsJeweller", String(user.isJeweller));
-          sessionStorage.setItem("IsAdmin", String(user.isAdmin));
-          sessionStorage.setItem("IsVReonAdmin", String(user.isVReonAdmin));
-          sessionStorage.setItem("loggedInUserName", String(user.name));
-          sessionStorage.setItem("loggedInUserLogo", String(user.logoImage));
-          this.router.navigate(['/home', { id: this.loggedInUserId }]);
-        }
-      });
-    this.signInFormGroup.reset();
+    this.isLoginSubmitted = true;
+    if (!this.signInFormGroup.get('email').errors?.['required'] &&
+      !this.signInFormGroup.get('password').errors?.['required']) {
+      this._loginService
+        .ValidateUser(this.userCredentials)
+        .pipe(takeUntil(this.unsubscribe))
+        .subscribe((user: UserInfo) => {
+          this.isLoginSubmitted = false;
+          if (user == null) {
+            this.isInvalidUser = true;
+          }
+          else {
+            this.isInvalidUser = false;
+            this.loggedInUserId = user.id;
+            sessionStorage.setItem("loggedInUser", JSON.stringify(user));
+            sessionStorage.setItem("loggedInUserId", this.loggedInUserId);
+            sessionStorage.setItem("IsJeweller", String(user.isJeweller));
+            sessionStorage.setItem("IsAdmin", String(user.isAdmin));
+            sessionStorage.setItem("IsVReonAdmin", String(user.isVReonAdmin));
+            sessionStorage.setItem("loggedInUserName", String(user.name));
+            sessionStorage.setItem("loggedInUserLogo", String(user.logoImage));
+            this.router.navigate(['/home', { id: this.loggedInUserId }]);
+          }
+        });
+      this.signInFormGroup.reset();
+    }
   }
 
   registerUser() {
-    const formValues = this.registerFormGroup.value;
-    var userToRegister = new RegisterUser();
-    userToRegister.name = formValues.name;
-    userToRegister.email = formValues.email;
-    userToRegister.password = formValues.password;
-    userToRegister.isJeweller = formValues.jeweller;
-    userToRegister.isAdmin = formValues.admin;
-    userToRegister.isVReonAdmin = formValues.vreonAdmin;
-    userToRegister.logoImage = this.logoImage;
-    userToRegister.assignedCategories = formValues.assignedCategories;
-    this._loginService
-      .RegisterUser(userToRegister)
-      .pipe(takeUntil(this.unsubscribe))
-      .subscribe({
-        next: (user) => {
-          this.loggedInUserId = user.id;
-          sessionStorage.setItem("loggedInUser", JSON.stringify(user));
-          sessionStorage.setItem("loggedInUserId", this.loggedInUserId);
-          sessionStorage.setItem("IsJeweller", String(user.isJeweller));
-          sessionStorage.setItem("IsAdmin", String(user.isAdmin));
-          sessionStorage.setItem("IsVReonAdmin", String(user.isVReonAdmin));
-          sessionStorage.setItem("loggedInUserName", String(user.name));
-          sessionStorage.setItem("loggedInUserLogo", String(user.logoImage));
-          this.router.navigate(['/home', { id: this.loggedInUserId }]);
-        },
-        error: (error) => { this.isRegistrationSuccessful = false; }
-      });
+    this.isRegisterSubmitted = true;
+    if (this.registerFormGroup.valid) {
+      const formValues = this.registerFormGroup.value;
+      var userToRegister = new RegisterUser();
+      userToRegister.name = formValues.name;
+      userToRegister.email = formValues.email;
+      userToRegister.password = formValues.password;
+      userToRegister.isJeweller = formValues.jeweller;
+      userToRegister.isAdmin = formValues.admin;
+      userToRegister.isVReonAdmin = formValues.vreonAdmin;
+      userToRegister.logoImage = this.logoImage;
+      userToRegister.assignedCategories = formValues.assignedCategories;
+      this._loginService
+        .RegisterUser(userToRegister)
+        .pipe(takeUntil(this.unsubscribe))
+        .subscribe({
+          next: (user) => {
+            this.loggedInUserId = user.id;
+            sessionStorage.setItem("loggedInUser", JSON.stringify(user));
+            sessionStorage.setItem("loggedInUserId", this.loggedInUserId);
+            sessionStorage.setItem("IsJeweller", String(user.isJeweller));
+            sessionStorage.setItem("IsAdmin", String(user.isAdmin));
+            sessionStorage.setItem("IsVReonAdmin", String(user.isVReonAdmin));
+            sessionStorage.setItem("loggedInUserName", String(user.name));
+            sessionStorage.setItem("loggedInUserLogo", String(user.logoImage));
+            this.router.navigate(['/home', { id: this.loggedInUserId }]);
+          },
+          error: (error) => { this.isRegistrationSuccessful = false; }
+        });
+    }
+
   }
 
   loginDefaultUser() {

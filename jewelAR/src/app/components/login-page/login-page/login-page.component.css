@@ -60,11 +60,6 @@ h1 {
     align-items: center;
 }
 
-/* .content-container {
-    width: 500px;
-    height: 500px;
-} */
-
 .form-container {
     display: flex;
     justify-content: center;
@@ -152,4 +147,9 @@ ng-select {
     justify-content: center;
     margin: 20px;
     text-align: center;
+}
+
+.invalid {
+    border-width: 2px;
+    border-color: rgba(255, 60, 0, 0.648);
 }

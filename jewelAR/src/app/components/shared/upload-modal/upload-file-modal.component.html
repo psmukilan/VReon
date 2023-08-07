@@ -9,8 +9,9 @@
     <div class="row">
       <div class="col-6">
         <label class="form-label" for="category">Category</label>
-        <ng-select id="category" [items]="jewelCategories" (change)="getSubCategoriesForCategory($event)" [closeOnSelect]="true"
-          formControlName="category"></ng-select>
+        <ng-select id="category" [items]="jewelCategories" (change)="getSubCategoriesForCategory($event)"
+          [closeOnSelect]="true" formControlName="category"></ng-select>
+          <div *ngIf="isSubmitted && jewelFormGroup.get('category').errors?.['required']" style="color: red;">Category is required</div>
       </div>
       <div class="col-6">
         <label class="form-label" for="subCategory">Sub Category</label>
@@ -26,41 +27,46 @@
     <div class="row">
       <div class="col-6">
         <label class="form-label" for="purity">Purity</label>
-        <ng-select id="purity" [items]="jewelPurity" [closeOnSelect]="true"
-          formControlName="purity"></ng-select>
+        <ng-select id="purity" [items]="jewelPurity" [closeOnSelect]="true" formControlName="purity"></ng-select>
+        <div class="col-6" *ngIf="isSubmitted && jewelFormGroup.get('purity').errors?.['required']" style="color: red;">Purity is required</div>
       </div>
       <div class="col-6">
         <label class="form-label" for="metalType">Metal type</label>
         <ng-select id="metalType" [items]="jewelMetalType" [closeOnSelect]="true"
           formControlName="metalType"></ng-select>
+          <div class="col-6" *ngIf="isSubmitted && jewelFormGroup.get('metalType').errors?.['required']" style="color: red;">MetalType is required</div>
       </div>
     </div>
-    <div class="row">
+        <div class="row">
       <div class="col-6">
         <label class="form-label" for="weight">Weight in grams</label>
-        <input type="number" id="weight" class="form-control" formControlName="weight" placeholder="Enter Weight" />
+        <input type="number" id="weight" [class.invalid]="isSubmitted && jewelFormGroup.get('weight').value <= 0"
+          class="form-control" formControlName="weight" placeholder="Enter Weight" />
       </div>
       <div class="col-6">
         <label class="form-label" for="price">Price</label>
-        <input type="number" id="price" class="form-control" formControlName="price" placeholder="Enter Price" />
+        <input type="number" id="price" [class.invalid]="isSubmitted && jewelFormGroup.get('price').value <= 0"
+          class="form-control" formControlName="price" placeholder="Enter Price" />
       </div>
     </div>
     <div class="row" style="padding-top: 30px;">
       <label class="form-label" for="image">Try On Image</label>
-      <input id="tryOnImage" class="form-control col-12" formControlName="tryOnImage" [writeFile]="true" type="file"
-        ng-file-model="files" (change)="onFileSelected($event)" />
+      <input id="tryOnImage" [class.invalid]="isSubmitted && selectedTryOnImage==undefined" class="form-control col-12"
+        formControlName="tryOnImage" [writeFile]="true" type="file" ng-file-model="files"
+        (change)="onFileSelected($event)" />
     </div>
     <div class="row" style="padding-top: 30px;">
       <label class="form-label" for="image">Display Images</label>
-      <input id="displayImages" class="form-control col-12" formControlName="displayImages" [writeFile]="true"
-        type="file" multiple="true" ng-file-model="files" (change)="onDisplayImageSelected($event)" />
+      <input id="displayImages" [class.invalid]="isSubmitted && selectedDisplayImages.length == 0"
+        class="form-control col-12" formControlName="displayImages" [writeFile]="true" type="file" multiple="true"
+        ng-file-model="files" (change)="onDisplayImageSelected($event)" />
     </div>
     <div class="row">
       <label class="form-label" for="description">Description</label>
       <textarea id="description" formControlName="description"></textarea>
     </div>
   </form>
-  <div *ngIf="isFormInValid" style="color: red">Form contains invalid information</div>
+  <!-- <div *ngIf="isFormInValid" style="color: red">Form contains invalid information</div> -->
 </div>
 <div class="modal-footer">
   <button type="button" class="btn btn-primary" (click)="submit()">
